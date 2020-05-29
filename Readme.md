@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Алексей Мелешко](https://up.htmlacademy.ru/javascript/20/user/1454929).
-* Наставник: Зазар Овчаров.
+* Наставник: [Захар Овчаров](https://htmlacademy.ru/profile/id906939).
 
 ---
 
