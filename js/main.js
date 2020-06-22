@@ -293,7 +293,6 @@ blockCapacity[3].disabled = true;
 currentCapacity.selectedIndex = 2;
 var address = document.querySelector('#address');
 address.setAttribute('readonly', true);
-console.log(address);
 
 roomNumber.addEventListener('change', function () {
   if (Number(roomNumber.value) === 1) {
@@ -322,6 +321,5 @@ roomNumber.addEventListener('change', function () {
     currentCapacity.selectedIndex = 3;
   }
 });
-console.log(bigPin);
 
 
