@@ -1,4 +1,8 @@
 'use strict';
+var BUNGALO = 'bungalo';
+var PALACE = 'palace';
+var FLAT = 'flat';
+var HOUSE = 'house';
 var PIN_START_POS_X = 570;
 var PIN_START_POS_Y = 375;
 var MIN_BUNGALO_PRICE = 0;
@@ -54,6 +58,8 @@ function getSomeElements(arr, parName) {
 function createTestLists() {
   var allLists = [];
   var sum = 1;
+  var locationX = PIN_START_POS_X;
+  var locationY = PIN_START_POS_Y;
   for (var i = 0; i < 8; i++) {
     var rRooms = getRandomInt(0, 4);
     if (rRooms === 0) {
@@ -68,9 +74,6 @@ function createTestLists() {
         roomsGuests = rRooms + ' комнаты для ' + forGuests + ' гостей';
       }
     }
-
-    var locationX = PIN_START_POS_X;
-    var locationY = PIN_START_POS_Y;
     var List = {
       author: {
         avatar: 'img/avatars/user0' + sum + '.png',
@@ -139,15 +142,16 @@ function manageStartForm(manage) {
       }
     } else {
       mapFilters.classList.add('ad-form--disabled');
-      for (var z = 0; z < arr.length; z++) {
-        arr[z].disabled = true;
-      }
+      arr.forEach(function (el) {
+        el.disabled = true;
+      });
     }
   }
   managingForm(mapFilterElement);
   managingForm(userAvatar);
   managingForm(userFormElements);
 }
+
 function renderCard() {
   var i = 0;
   var newFragment = document.createDocumentFragment();
@@ -196,13 +200,13 @@ var bigPin = document.querySelector('.map__pin--main');
 var bigPinClicked = false;
 
 bigPin.addEventListener('mousedown', function (evt) {
+  var addressY = 0;
+  var pinYSize = 54.5;
   bigPinClicked = true;
   address.value = '250, 600';
   if (evt.button === 0) {
     manageStartForm('activate');
   }
-  var addressY = 0;
-  var pinYSize = 54.5;
   mapOverlay.addEventListener('mousemove', function (evt2) {
     if (bigPinClicked) {
       if (evt2.offsetY >= 130 - pinYSize) {
@@ -243,20 +247,23 @@ var typeInput = document.querySelector('#type');
 var currentMinPrice = 5000;
 
 typeInput.addEventListener('change', function () {
-  if (typeInput.value === 'bungalo') {
-    priceInput.placeholder = MIN_BUNGALO_PRICE;
-    currentMinPrice = MIN_BUNGALO_PRICE;
-  } else if (typeInput.value === 'palace') {
-    priceInput.placeholder = MIN_PALACE_PRICE;
-    currentMinPrice = MIN_PALACE_PRICE;
-  } else if (typeInput.value === 'house') {
-    priceInput.placeholder = MIN_HOUSE_PRICE;
-    currentMinPrice = MIN_HOUSE_PRICE;
-  } else if (typeInput.value === 'flat') {
-    priceInput.placeholder = MIN_FLAT_PRICE;
-    currentMinPrice = MIN_FLAT_PRICE;
-  } else {
-    priceInput.setCustomValidity('');
+  switch (typeInput.value) {
+    case BUNGALO:
+      priceInput.placeholder = MIN_BUNGALO_PRICE;
+      currentMinPrice = MIN_BUNGALO_PRICE;
+      break;
+    case PALACE:
+      priceInput.placeholder = MIN_PALACE_PRICE;
+      currentMinPrice = MIN_PALACE_PRICE;
+      break;
+    case HOUSE:
+      priceInput.placeholder = MIN_HOUSE_PRICE;
+      currentMinPrice = MIN_HOUSE_PRICE;
+      break;
+    case FLAT:
+      priceInput.placeholder = MIN_FLAT_PRICE;
+      currentMinPrice = MIN_FLAT_PRICE;
+      break;
   }
 });
 
@@ -295,30 +302,35 @@ var address = document.querySelector('#address');
 address.setAttribute('readonly', true);
 
 roomNumber.addEventListener('change', function () {
-  if (Number(roomNumber.value) === 1) {
-    blockCapacity[0].disabled = true;
-    blockCapacity[1].disabled = true;
-    blockCapacity[2].disabled = false;
-    blockCapacity[3].disabled = true;
-    currentCapacity.selectedIndex = 2;
-  } else if (Number(roomNumber.value) === 2) {
-    blockCapacity[0].disabled = true;
-    blockCapacity[1].disabled = false;
-    blockCapacity[2].disabled = false;
-    blockCapacity[3].disabled = true;
-    currentCapacity.selectedIndex = 1;
-  } else if (Number(roomNumber.value) === 3) {
-    blockCapacity[0].disabled = false;
-    blockCapacity[1].disabled = false;
-    blockCapacity[2].disabled = false;
-    blockCapacity[3].disabled = true;
-    currentCapacity.selectedIndex = 0;
-  } else if (Number(roomNumber.value) === 100) {
-    blockCapacity[0].disabled = true;
-    blockCapacity[1].disabled = true;
-    blockCapacity[2].disabled = true;
-    blockCapacity[3].disabled = false;
-    currentCapacity.selectedIndex = 3;
+  switch (Number(roomNumber.value)) {
+    case 1:
+      blockCapacity[0].disabled = true;
+      blockCapacity[1].disabled = true;
+      blockCapacity[2].disabled = false;
+      blockCapacity[3].disabled = true;
+      break;
+    case 2:
+      blockCapacity[0].disabled = true;
+      blockCapacity[1].disabled = false;
+      blockCapacity[2].disabled = false;
+      blockCapacity[3].disabled = true;
+      currentCapacity.selectedIndex = 1;
+      break;
+    case 3:
+      blockCapacity[0].disabled = false;
+      blockCapacity[1].disabled = false;
+      blockCapacity[2].disabled = false;
+      blockCapacity[3].disabled = true;
+      currentCapacity.selectedIndex = 0;
+      break;
+    case 100:
+      blockCapacity[0].disabled = true;
+      blockCapacity[1].disabled = true;
+      blockCapacity[2].disabled = true;
+      blockCapacity[3].disabled = false;
+      currentCapacity.selectedIndex = 3;
+      break;
+
   }
 });
 
