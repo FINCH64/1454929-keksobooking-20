@@ -1,6 +1,4 @@
 'use strict';
-
-
 (function () {
   window.main = {
     map: document.querySelector('.map'),
