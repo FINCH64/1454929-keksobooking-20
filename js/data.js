@@ -1,8 +1,8 @@
 'use strict';
 
 (function () {
-  var PINXSIZE = 55;
-  var PINYSIZE = 33;
+  var PINXSIZE = 66;
+  var PINYSIZE = 75;
   var PALACE_RU = 'Дворец';
   var FLAT_RU = 'Квартира';
   var HOUSE_RU = 'Дом';

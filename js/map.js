@@ -1,8 +1,11 @@
 'use strict';
 (function () {
+  var PINXSTART = 790;
+  var PINYSTART = 407;
   var mapOverlay = document.querySelector('.map__overlay');
   var bigPin = document.querySelector('.map__pin--main');
   var bigPinClicked = false;
+  var sum1 = 0;
 
   function manageStartForm(manage) {
     var userForm = document.querySelector('.ad-form');
@@ -10,6 +13,14 @@
     var mapFilters = document.querySelector('.map__filters');
     var userAvatar = document.querySelectorAll('#avatar');
     var userFormElements = document.querySelectorAll('.ad-form__element');
+    var h2Map = mapOverlay.querySelector('h2');
+    var promo = document.querySelector('.promo');
+    var main = document.querySelector('main');
+    mapOverlay.removeChild(h2Map);
+    while (promo.firstChild) {
+      promo.removeChild(promo.firstChild);
+    }
+    main.removeChild(promo);
     function managingForm(arr) {
       if (manage === 'activate') {
         window.main.map.classList.remove('map--faded');
@@ -34,30 +45,37 @@
     var addressY = 0;
     var addressX = 0;
     bigPinClicked = true;
-    window.main.address.value = '250, 600';
-    if (evt.button === 0) {
+    window.main.address.value = PINXSTART + ', ' + PINYSTART;
+    if (evt.button === 0 && sum1 === 0) {
       manageStartForm('activate');
       window.pin.createDOMElement();
+      sum1++;
     }
     mapOverlay.addEventListener('mousemove', function (adressMousemoveEvt) {
       if (bigPinClicked) {
-        if (adressMousemoveEvt.offsetY >= 130 - window.data.PINYSIZE) {
-          if (adressMousemoveEvt.offsetY <= 630 - window.data.PINYSIZE) {
+        if (adressMousemoveEvt.offsetY - window.data.PINYSIZE >= 130) {
+          if (adressMousemoveEvt.offsetY <= 630) {
             addressY = adressMousemoveEvt.offsetY + window.data.PINYSIZE;
+            bigPin.style.top = adressMousemoveEvt.offsetY - window.data.PINYSIZE + 'px';
           } else {
             addressY = 630;
+            bigPin.style.top = (630 - window.data.PINYSIZE) + 'px';
           }
         } else {
           addressY = 130;
+          bigPin.style.top = (130 - window.data.PINYSIZE) + 'px';
         }
-        if (adressMousemoveEvt.offsetX >= 0 + window.data.PINXSIZE) {
-          if (adressMousemoveEvt.offsetX <= 1200 - window.data.PINXSIZE) {
+        if (adressMousemoveEvt.offsetX >= 5) {
+          if (adressMousemoveEvt.offsetX <= 1195) {
             addressX = adressMousemoveEvt.offsetX + window.data.PINXSIZE;
+            bigPin.style.left = adressMousemoveEvt.offsetX - window.data.PINXSIZE / 2 + 'px';
           } else {
             addressX = 1200;
+            bigPin.style.left = (1200 - window.data.PINXSIZE / 2) + 'px';
           }
         } else {
           addressX = 0;
+          bigPin.style.left = -window.data.PINXSIZE / 2 + 'px';
         }
         window.main.address.value = addressX + ', ' + addressY;
       }
@@ -72,7 +90,7 @@
   });
   bigPin.addEventListener('keydown', function (evt) {
     if (evt.key === 'Enter') {
-      window.main.address.value = '250, 600';
+      window.main.address.value = PINXSTART + ', ' + PINYSTART;
       manageStartForm('activate');
       window.pin.createDOMElement();
     }
