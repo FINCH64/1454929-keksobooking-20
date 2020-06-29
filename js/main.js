@@ -9,11 +9,13 @@ var MIN_HOUSE_PRICE = 5000;
 var MIN_PALACE_PRICE = 10000;
 var PINYSIZE = 55;
 var PINXSIZE = 33;
-var palace = 'Дворец';
-var flat = 'Квартира';
-var house = 'Дом';
-var bungalo = 'Бунгало';
-var types = [palace, flat, house, bungalo];
+var PALACE_RU = 'Дворец';
+var FLAT_RU = 'Квартира';
+var HOUSE_RU = 'Дом';
+var BUNGALO_RU = 'Бунгало';
+var FOR_GUESTS = 'Не для гостей.';
+var LISTS_COUNT = 8;
+var types = [PALACE_RU, FLAT_RU, HOUSE_RU, BUNGALO_RU];
 var times = ['12.00', '13.00', '14.00'];
 var features = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var photos = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg',
@@ -58,20 +60,19 @@ function getSomeElements(arr, parName) {
 function createTestLists() {
   var allLists = [];
   var sum = 1;
-  for (var i = 0; i < 8; i++) {
+  for (var i = 0; i < LISTS_COUNT; i++) {
     var locationX = getRandomInt(1 + PINXSIZE, 1199 - PINXSIZE);
     var locationY = getRandomInt(130 + PINYSIZE, 630 - PINYSIZE);
     var rRooms = getRandomInt(0, 4);
     if (rRooms === 0) {
-      var forGuests = 'Не для гостей.';
-      var roomsGuests = forGuests;
+      var roomsGuests = FOR_GUESTS;
     } else {
       if (rRooms === 1) {
-        forGuests = Math.round(rRooms * 1.5);
-        roomsGuests = rRooms + ' комната для ' + forGuests + ' гостей';
+        FOR_GUESTS = Math.round(rRooms * 1.5);
+        roomsGuests = rRooms + ' комната для ' + FOR_GUESTS + ' гостей';
       } else {
-        forGuests = Math.round(rRooms * 1.5);
-        roomsGuests = rRooms + ' комнаты для ' + forGuests + ' гостей';
+        FOR_GUESTS = Math.round(rRooms * 1.5);
+        roomsGuests = rRooms + ' комнаты для ' + FOR_GUESTS + ' гостей';
       }
     }
     var List = {
@@ -90,7 +91,7 @@ function createTestLists() {
         price: getRandomInt(1000, 10000),
         type: getRandomThing(types),
         rooms: rRooms,
-        guests: forGuests,
+        guests: FOR_GUESTS,
         checkin: getRandomThing(times),
         checkout: getRandomThing(times),
         features: getSomeElements(features, 'features'),
@@ -137,9 +138,9 @@ function manageStartForm(manage) {
       map.classList.remove('map--faded');
       userForm.classList.remove('ad-form--disabled');
       mapFilters.classList.remove('ad-form--disabled');
-      for (var i = 0; i < arr.length; i++) {
-        arr[i].disabled = false;
-      }
+      arr.forEach(function (el) {
+        el.disabled = false;
+      });
     } else {
       mapFilters.classList.add('ad-form--disabled');
       arr.forEach(function (el) {
@@ -151,6 +152,7 @@ function manageStartForm(manage) {
   managingForm(userAvatar);
   managingForm(userFormElements);
 }
+
 function renderCard(i) {
   var newFragment = document.createDocumentFragment();
 
@@ -198,28 +200,28 @@ var bigPin = document.querySelector('.map__pin--main');
 var bigPinClicked = false;
 
 bigPin.addEventListener('mousedown', function (evt) {
+  var addressY = 0;
+  var addressX = 0;
   bigPinClicked = true;
   address.value = '250, 600';
   if (evt.button === 0) {
     manageStartForm('activate');
     createDOMElement();
   }
-  var addressY = 0;
-  var addressX = 0;
-  mapOverlay.addEventListener('mousemove', function (evt2) {
+  mapOverlay.addEventListener('mousemove', function (adressMousemoveEvt) {
     if (bigPinClicked) {
-      if (evt2.offsetY >= 130 - PINYSIZE) {
-        if (evt2.offsetY <= 630 - PINYSIZE) {
-          addressY = evt2.offsetY + PINYSIZE;
+      if (adressMousemoveEvt.offsetY >= 130 - PINYSIZE) {
+        if (adressMousemoveEvt.offsetY <= 630 - PINYSIZE) {
+          addressY = adressMousemoveEvt.offsetY + PINYSIZE;
         } else {
           addressY = 630;
         }
       } else {
         addressY = 130;
       }
-      if (evt2.offsetX >= 0 + PINXSIZE) {
-        if (evt2.offsetX <= 1200 - PINXSIZE) {
-          addressX = evt2.offsetX + PINXSIZE;
+      if (adressMousemoveEvt.offsetX >= 0 + PINXSIZE) {
+        if (adressMousemoveEvt.offsetX <= 1200 - PINXSIZE) {
+          addressX = adressMousemoveEvt.offsetX + PINXSIZE;
         } else {
           addressX = 1200;
         }
@@ -379,8 +381,8 @@ function activateTemplate(evt, type) {
       activePin.classList.remove('map__pin--active');
     });
 
-    document.addEventListener('keydown', function (evt2) {
-      if (evt2.key === 'Escape') {
+    document.addEventListener('keydown', function (adressMousemoveEvt) {
+      if (adressMousemoveEvt.key === 'Escape') {
         article2.remove();
         activePin.classList.remove('map__pin--active');
       }
