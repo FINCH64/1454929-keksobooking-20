@@ -1,19 +1,21 @@
 'use strict';
 var BUNGALO = 'bungalo';
+var HOUSE = 'house';
 var PALACE = 'palace';
 var FLAT = 'flat';
-var HOUSE = 'house';
-var PIN_START_POS_X = 570;
-var PIN_START_POS_Y = 375;
 var MIN_BUNGALO_PRICE = 0;
 var MIN_FLAT_PRICE = 1000;
 var MIN_HOUSE_PRICE = 5000;
 var MIN_PALACE_PRICE = 10000;
-var palace = 'Дворец';
-var flat = 'Квартира';
-var house = 'Дом';
-var bungalo = 'Бунгало';
-var types = [palace, flat, house, bungalo];
+var PINYSIZE = 55;
+var PINXSIZE = 33;
+var PALACE_RU = 'Дворец';
+var FLAT_RU = 'Квартира';
+var HOUSE_RU = 'Дом';
+var BUNGALO_RU = 'Бунгало';
+var FOR_GUESTS = 'Не для гостей.';
+var LISTS_COUNT = 8;
+var types = [PALACE_RU, FLAT_RU, HOUSE_RU, BUNGALO_RU];
 var times = ['12.00', '13.00', '14.00'];
 var features = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var photos = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg',
@@ -58,20 +60,19 @@ function getSomeElements(arr, parName) {
 function createTestLists() {
   var allLists = [];
   var sum = 1;
-  var locationX = PIN_START_POS_X;
-  var locationY = PIN_START_POS_Y;
-  for (var i = 0; i < 8; i++) {
+  for (var i = 0; i < LISTS_COUNT; i++) {
+    var locationX = getRandomInt(1 + PINXSIZE, 1199 - PINXSIZE);
+    var locationY = getRandomInt(130 + PINYSIZE, 630 - PINYSIZE);
     var rRooms = getRandomInt(0, 4);
     if (rRooms === 0) {
-      var forGuests = 'Не для гостей.';
-      var roomsGuests = forGuests;
+      var roomsGuests = FOR_GUESTS;
     } else {
       if (rRooms === 1) {
-        forGuests = Math.round(rRooms * 1.5);
-        roomsGuests = rRooms + ' комната для ' + forGuests + ' гостей';
+        FOR_GUESTS = Math.round(rRooms * 1.5);
+        roomsGuests = rRooms + ' комната для ' + FOR_GUESTS + ' гостей';
       } else {
-        forGuests = Math.round(rRooms * 1.5);
-        roomsGuests = rRooms + ' комнаты для ' + forGuests + ' гостей';
+        FOR_GUESTS = Math.round(rRooms * 1.5);
+        roomsGuests = rRooms + ' комнаты для ' + FOR_GUESTS + ' гостей';
       }
     }
     var List = {
@@ -90,7 +91,7 @@ function createTestLists() {
         price: getRandomInt(1000, 10000),
         type: getRandomThing(types),
         rooms: rRooms,
-        guests: forGuests,
+        guests: FOR_GUESTS,
         checkin: getRandomThing(times),
         checkout: getRandomThing(times),
         features: getSomeElements(features, 'features'),
@@ -108,22 +109,22 @@ function createTestLists() {
   return allLists;
 }
 
-var mapPin = document.createElement('button');
-
 function createDOMElement() {
 
   var mapPins = document.querySelector('.map__pins');
   var fragment = document.createDocumentFragment();
-
   for (var i = 0; i < 8; i++) {
+    var mapPin = document.createElement('button');
     mapPin.type = 'button';
     mapPin.className = 'map__pin';
-    mapPin.style = 'left: ' + (nLists[i].location.x + 25) + 'px; top:' + (nLists[i].location.y + 70) + 'px;';
+    mapPin.id = 'map_pin_n_' + i;
+    mapPin.style = 'left: ' + (nLists[i].location.x) + 'px; top:' + (nLists[i].location.y) + 'px;';
     mapPin.innerHTML = '<img src = ' + nLists[i].author.avatar +
     ' width="40" height="40" draggable="false" alt="' + nLists[i].offer.title + '">';
     fragment.appendChild(mapPin);
   }
   mapPins.appendChild(fragment);
+  activateCards();
 }
 
 function manageStartForm(manage) {
@@ -137,9 +138,9 @@ function manageStartForm(manage) {
       map.classList.remove('map--faded');
       userForm.classList.remove('ad-form--disabled');
       mapFilters.classList.remove('ad-form--disabled');
-      for (var i = 0; i < arr.length; i++) {
-        arr[i].disabled = false;
-      }
+      arr.forEach(function (el) {
+        el.disabled = false;
+      });
     } else {
       mapFilters.classList.add('ad-form--disabled');
       arr.forEach(function (el) {
@@ -152,8 +153,7 @@ function manageStartForm(manage) {
   managingForm(userFormElements);
 }
 
-function renderCard() {
-  var i = 0;
+function renderCard(i) {
   var newFragment = document.createDocumentFragment();
 
   var artickleCard = document.createElement('article');
@@ -201,24 +201,34 @@ var bigPinClicked = false;
 
 bigPin.addEventListener('mousedown', function (evt) {
   var addressY = 0;
-  var pinYSize = 54.5;
+  var addressX = 0;
   bigPinClicked = true;
   address.value = '250, 600';
   if (evt.button === 0) {
     manageStartForm('activate');
+    createDOMElement();
   }
-  mapOverlay.addEventListener('mousemove', function (evt2) {
+  mapOverlay.addEventListener('mousemove', function (adressMousemoveEvt) {
     if (bigPinClicked) {
-      if (evt2.offsetY >= 130 - pinYSize) {
-        if (evt2.offsetY <= 630 - pinYSize) {
-          addressY = evt2.offsetY + pinYSize;
+      if (adressMousemoveEvt.offsetY >= 130 - PINYSIZE) {
+        if (adressMousemoveEvt.offsetY <= 630 - PINYSIZE) {
+          addressY = adressMousemoveEvt.offsetY + PINYSIZE;
         } else {
           addressY = 630;
         }
       } else {
         addressY = 130;
       }
-      address.value = evt2.offsetX + ', ' + addressY;
+      if (adressMousemoveEvt.offsetX >= 0 + PINXSIZE) {
+        if (adressMousemoveEvt.offsetX <= 1200 - PINXSIZE) {
+          addressX = adressMousemoveEvt.offsetX + PINXSIZE;
+        } else {
+          addressX = 1200;
+        }
+      } else {
+        addressX = 0;
+      }
+      address.value = addressX + ', ' + addressY;
     }
   });
   mapOverlay.addEventListener('mouseup', function () {
@@ -233,6 +243,7 @@ bigPin.addEventListener('mousedown', function (evt) {
 bigPin.addEventListener('keydown', function (evt) {
   if (evt.key === 'Enter') {
     manageStartForm('activate');
+    createDOMElement();
   }
 });
 
@@ -240,8 +251,6 @@ manageStartForm();
 var allLists = [createTestLists()];
 var nLists = allLists[0];
 var map = document.querySelector('.map');
-createDOMElement();
-renderCard();
 var priceInput = document.querySelector('#price');
 var typeInput = document.querySelector('#type');
 var currentMinPrice = 5000;
@@ -277,6 +286,9 @@ priceInput.addEventListener('input', function () {
     priceInput.setCustomValidity('');
   }
 });
+
+var avatarInput = document.querySelector('#avatar');
+avatarInput.accept = 'img/jpeg, img/svg';
 
 var timein = document.querySelector('#timein');
 var timeout = document.querySelector('#timeout');
@@ -330,8 +342,69 @@ roomNumber.addEventListener('change', function () {
       blockCapacity[3].disabled = false;
       currentCapacity.selectedIndex = 3;
       break;
-
   }
 });
 
+function activateTemplate(evt, type) {
+  var mapPins = document.querySelector('.map__pins');
+  var article = map.querySelector('article');
+  if (article !== null && article !== undefined) {
+    article.remove();
+    mapPins.querySelector('.map__pin--active').classList.remove('map__pin--active');
+  }
 
+  if (type === 'click') {
+    for (var a = 0; a < nLists.length; a++) {
+      if (evt.path[1].id === 'map_pin_n_' + a) {
+        renderCard(a);
+        evt.path[1].className = 'map__pin map__pin--active';
+        break;
+      }
+    }
+  } else {
+    for (var b = 0; b < nLists.length; b++) {
+      if (evt.path[0].id === 'map_pin_n_' + b) {
+        renderCard(b);
+        evt.path[0].className = 'map__pin map__pin--active';
+        break;
+      }
+    }
+  }
+
+  var article2 = map.querySelector('article');
+  var activePin = mapPins.querySelector('.map__pin--active');
+
+  if (article2 !== null && activePin !== null) {
+    var popupClose = article2.querySelector('.popup__close');
+    popupClose.addEventListener('click', function () {
+      article2.remove();
+      activePin.classList.remove('map__pin--active');
+    });
+
+    document.addEventListener('keydown', function (adressMousemoveEvt) {
+      if (adressMousemoveEvt.key === 'Escape') {
+        article2.remove();
+        activePin.classList.remove('map__pin--active');
+      }
+    });
+  }
+
+}
+
+function activateCards() {
+  var mapPins2 = [];
+  for (var z = 0; z < nLists.length; z++) {
+    var mapPin2 = document.querySelector('#map_pin_n_' + z);
+    mapPins2.push(mapPin2);
+  }
+  mapPins2.forEach(function (pin) {
+    pin.addEventListener('click', function (evt3) {
+      activateTemplate(evt3, 'click');
+    });
+    pin.addEventListener('keyup', function (evt4) {
+      if (evt4.key === 'Enter') {
+        activateTemplate(evt4, 'key');
+      }
+    });
+  });
+}
