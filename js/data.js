@@ -1,8 +1,8 @@
 'use strict';
 
 (function () {
-  var PINXSIZE = 55;
-  var PINYSIZE = 33;
+  var PINXSIZE = 66;
+  var PINYSIZE = 75;
   var PALACE_RU = 'Дворец';
   var FLAT_RU = 'Квартира';
   var HOUSE_RU = 'Дом';
@@ -58,16 +58,18 @@
       var locationX = getRandomInt(1 + PINXSIZE, 1199 - PINXSIZE);
       var locationY = getRandomInt(130 + PINYSIZE, 630 - PINYSIZE);
       var rRooms = getRandomInt(0, 4);
-      if (rRooms === 0) {
-        var roomsGuests = FOR_GUESTS;
-      } else {
-        if (rRooms === 1) {
+
+      switch (rRooms) {
+        case 0:
+          var roomsGuests = FOR_GUESTS;
+          break;
+        case 1:
           FOR_GUESTS = Math.round(rRooms * 1.5);
           roomsGuests = rRooms + ' комната для ' + FOR_GUESTS + ' гостей';
-        } else {
+          break;
+        default:
           FOR_GUESTS = Math.round(rRooms * 1.5);
           roomsGuests = rRooms + ' комнаты для ' + FOR_GUESTS + ' гостей';
-        }
       }
       var List = {
         author: {

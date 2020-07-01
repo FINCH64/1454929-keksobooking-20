@@ -1,8 +1,25 @@
 'use strict';
 (function () {
+  var KEYBOARD_KEYS = {
+    esc: 'Escape',
+    enter: 'Enter',
+  };
+  var ACTION_TYPE = {
+    click: 'click',
+    key: 'key',
+  };
+  var MOUSE_LEFT_BUTTON = 0;
+  var X_GAP = 5;
+  var LEFT_X_BODER = 0;
+  var RIGHT_X_BORDER = 1200;
+  var UP_Y_BORDER = 130;
+  var BOTTOM_Y_BORDER = 630;
+  var PIN_X_START = 604;
+  var PIN_Y_START = 413;
   var mapOverlay = document.querySelector('.map__overlay');
   var bigPin = document.querySelector('.map__pin--main');
   var bigPinClicked = false;
+  var sum1 = 0;
 
   function manageStartForm(manage) {
     var userForm = document.querySelector('.ad-form');
@@ -10,6 +27,14 @@
     var mapFilters = document.querySelector('.map__filters');
     var userAvatar = document.querySelectorAll('#avatar');
     var userFormElements = document.querySelectorAll('.ad-form__element');
+    var h2Map = mapOverlay.querySelector('h2');
+    var promo = document.querySelector('.promo');
+    var main = document.querySelector('main');
+    mapOverlay.removeChild(h2Map);
+    while (promo.firstChild) {
+      promo.removeChild(promo.firstChild);
+    }
+    main.removeChild(promo);
     function managingForm(arr) {
       if (manage === 'activate') {
         window.main.map.classList.remove('map--faded');
@@ -34,30 +59,37 @@
     var addressY = 0;
     var addressX = 0;
     bigPinClicked = true;
-    window.main.address.value = '250, 600';
-    if (evt.button === 0) {
+    window.main.address.value = PIN_X_START + ', ' + PIN_Y_START;
+    if (evt.button === MOUSE_LEFT_BUTTON && sum1 === 0) {
       manageStartForm('activate');
       window.pin.createDOMElement();
+      sum1++;
     }
     mapOverlay.addEventListener('mousemove', function (adressMousemoveEvt) {
       if (bigPinClicked) {
-        if (adressMousemoveEvt.offsetY >= 130 - window.data.PINYSIZE) {
-          if (adressMousemoveEvt.offsetY <= 630 - window.data.PINYSIZE) {
+        if (adressMousemoveEvt.offsetY - window.data.PINYSIZE >= UP_Y_BORDER) {
+          if (adressMousemoveEvt.offsetY <= BOTTOM_Y_BORDER) {
             addressY = adressMousemoveEvt.offsetY + window.data.PINYSIZE;
+            bigPin.style.top = adressMousemoveEvt.offsetY - window.data.PINYSIZE + 'px';
           } else {
-            addressY = 630;
+            addressY = BOTTOM_Y_BORDER;
+            bigPin.style.top = (BOTTOM_Y_BORDER - window.data.PINYSIZE) + 'px';
           }
         } else {
-          addressY = 130;
+          addressY = UP_Y_BORDER;
+          bigPin.style.top = (UP_Y_BORDER - window.data.PINYSIZE) + 'px';
         }
-        if (adressMousemoveEvt.offsetX >= 0 + window.data.PINXSIZE) {
-          if (adressMousemoveEvt.offsetX <= 1200 - window.data.PINXSIZE) {
+        if (adressMousemoveEvt.offsetX >= LEFT_X_BODER + X_GAP) {
+          if (adressMousemoveEvt.offsetX <= RIGHT_X_BORDER - X_GAP) {
             addressX = adressMousemoveEvt.offsetX + window.data.PINXSIZE;
+            bigPin.style.left = adressMousemoveEvt.offsetX - window.data.PINXSIZE / 2 + 'px';
           } else {
-            addressX = 1200;
+            addressX = RIGHT_X_BORDER;
+            bigPin.style.left = (RIGHT_X_BORDER - window.data.PINXSIZE / 2) + 'px';
           }
         } else {
-          addressX = 0;
+          addressX = LEFT_X_BODER;
+          bigPin.style.left = -window.data.PINXSIZE / 2 + 'px';
         }
         window.main.address.value = addressX + ', ' + addressY;
       }
@@ -69,10 +101,15 @@
     bigPin.addEventListener('mouseup', function () {
       bigPinClicked = false;
     });
+
+    document.addEventListener('mouseup', function () {
+      bigPinClicked = false;
+    });
+
   });
   bigPin.addEventListener('keydown', function (evt) {
-    if (evt.key === 'Enter') {
-      window.main.address.value = '250, 600';
+    if (evt.key === KEYBOARD_KEYS.enter) {
+      window.main.address.value = PIN_X_START + ', ' + PIN_Y_START;
       manageStartForm('activate');
       window.pin.createDOMElement();
     }
@@ -114,7 +151,7 @@
       });
 
       document.addEventListener('keydown', function (adressMousemoveEvt) {
-        if (adressMousemoveEvt.key === 'Escape') {
+        if (adressMousemoveEvt.key === KEYBOARD_KEYS.esc) {
           article2.remove();
           activePin.classList.remove('map__pin--active');
         }
@@ -133,11 +170,11 @@
       }
       mapPins2.forEach(function (pin) {
         pin.addEventListener('click', function (evt3) {
-          activateTemplate(evt3, 'click');
+          activateTemplate(evt3, ACTION_TYPE.click);
         });
         pin.addEventListener('keyup', function (evt4) {
-          if (evt4.key === 'Enter') {
-            activateTemplate(evt4, 'key');
+          if (evt4.key === KEYBOARD_KEYS.enter) {
+            activateTemplate(evt4, ACTION_TYPE.key);
           }
         });
       });
