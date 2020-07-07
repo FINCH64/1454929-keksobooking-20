@@ -164,6 +164,7 @@
   window.map = {
     activateCards: function () {
       var mapPins2 = [];
+      console.log(window.data.nLists.length);
       for (var z = 0; z < window.data.nLists.length; z++) {
         var mapPin2 = document.querySelector('#map_pin_n_' + z);
         mapPins2.push(mapPin2);

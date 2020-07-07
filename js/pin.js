@@ -4,7 +4,7 @@
     createDOMElement: function () {
       var mapPins = document.querySelector('.map__pins');
       var fragment = document.createDocumentFragment();
-      for (var i = 0; i < 8; i++) {
+      for (var i = 0; i < window.data.nLists.length; i++) {
         var mapPin = document.createElement('button');
         mapPin.type = 'button';
         mapPin.className = 'map__pin';
