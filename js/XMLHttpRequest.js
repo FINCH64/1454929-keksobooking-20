@@ -48,7 +48,6 @@
 
     xhr.timeout = 10000;
     xhr.open('POST', URL);
-    console.log(xhr);
     xhr.send(data);
   };
 

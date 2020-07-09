@@ -14,20 +14,102 @@
   var bigPin = document.querySelector('.map__pin--main');
   var reset = document.querySelector('.ad-form__reset');
   var currentMinPrice = 5000;
+  var address = document.querySelector('#address');
+
+  function errMessageCreator() {
+    var errDiv = document.createElement('div');
+    errDiv.className = 'error';
+    var errP = document.createElement('p');
+    errP.className = 'error__message';
+    errP.textContent = 'Ошибка загрузки объявления';
+    var errButton = document.createElement('button');
+    errButton.className = 'error_button';
+    errButton.textContent = 'Попробовать снова';
+    errDiv.appendChild(errP);
+    errDiv.appendChild(errButton);
+    window.main.map.appendChild(errDiv);
+    document.addEventListener('click', function () {
+      window.main.map.removeChild(errDiv);
+    });
+
+    document.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Escape') {
+        window.main.map.removeChild(errDiv);
+      }
+    });
+  }
+  function sucessMessageCreator() {
+    var sucDiv = document.createElement('div');
+    sucDiv.className = 'success';
+    var sucP = document.createElement('p');
+    sucP.className = 'success__message';
+    sucP.innerHTML = 'Ваше объявление<br>успешно размещено!';
+    sucDiv.appendChild(sucP);
+    window.main.map.appendChild(sucDiv);
+    document.addEventListener('click', function () {
+      window.main.map.removeChild(sucDiv);
+      reset.click();
+      window.activate('disable');
+    });
+
+    document.addEventListener('keydown', function (evt) {
+      if (evt.key === 'Escape') {
+        if (!window.main.map.sucDiv) {
+          window.main.map.removeChild(sucDiv);
+          reset.click();
+          window.activate('disable');
+        }
+      }
+    });
+  }
+
   submitButton.addEventListener('click', function (evt) {
-    evt.preventDefault();
     bigPin.style.top = 375 + 'px';
     bigPin.style.left = 570 + 'px';
     var form = document.querySelector('.ad-form');
-    window.upload(new FormData(form), function (response) {
-      console.log(response);
-      reset.click();
-      window.activate('disable');
-    }, function (message) {
-      throw new Error(message);
-    });
+    console.log(priceValidity);
+    if (priceValidity === true && titleValidity === true) {
+      window.upload(new FormData(form), function (response) {
+        console.log(response);
+        sucessMessageCreator();
+      }, function () {
+        console.log(111111);
+        errMessageCreator();
+      });
+      evt.preventDefault();
+    }
+  });
+  var priceValidity = false;
+  priceInput.addEventListener('input', function () {
+    var priceValue = priceInput.value;
+    if (priceValue < currentMinPrice) {
+      priceInput.setCustomValidity('Цена начинается от ' + currentMinPrice + ' ₽/ночь');
+      priceValidity = false;
+    } else if (priceValue > 1000000) {
+      priceInput.setCustomValidity('Цена не может превышать 1 000 000' + ' ₽/ночь');
+      priceValidity = false;
+    } else {
+      priceValidity = true;
+      priceInput.setCustomValidity('');
+    }
   });
 
+  var title = document.querySelector('#title');
+  var titleValidity = false;
+  title.addEventListener('change', function () {
+    switch (true) {
+      case title.value.length < 30:
+        titleValidity = false;
+        break;
+      case title.value.length > 100:
+        titleValidity = false;
+        break;
+      default:
+        titleValidity = true;
+        break;
+    }
+
+  });
 
   typeInput.addEventListener('change', function () {
     switch (typeInput.value) {
@@ -108,7 +190,7 @@
     }
   });
   reset.addEventListener('click', function () {
-    window.main.address.value = window.map.pinXStart + ', ' + window.map.pinYStart;
+    address.value = window.map.pinXStart + ', ' + window.map.pinYStart;
     bigPin.style.top = 375 + 'px';
     bigPin.style.left = 570 + 'px';
   });
