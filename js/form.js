@@ -67,13 +67,10 @@
     bigPin.style.top = 375 + 'px';
     bigPin.style.left = 570 + 'px';
     var form = document.querySelector('.ad-form');
-    console.log(priceValidity);
     if (priceValidity === true && titleValidity === true) {
-      window.upload(new FormData(form), function (response) {
-        console.log(response);
+      window.upload(new FormData(form), function () {
         sucessMessageCreator();
       }, function () {
-        console.log(111111);
         errMessageCreator();
       });
       evt.preventDefault();
