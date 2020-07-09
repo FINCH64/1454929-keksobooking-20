@@ -8,14 +8,12 @@
   };
 
   var onSuccess = function (data) {
+    window.data = {
+      PINXSIZE: PINXSIZE,
+      PINYSIZE: PINYSIZE,
+      nLists: data,
+    };
     function createTestLists() {
-      var allLists = [];
-      allLists = data;
-      window.data = {
-        PINXSIZE: PINXSIZE,
-        PINYSIZE: PINYSIZE,
-        nLists: allLists,
-      };
     }
     createTestLists();
   };

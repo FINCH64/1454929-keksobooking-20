@@ -14,7 +14,7 @@
       artickleCard.insertAdjacentHTML('beforeend', '<h4 class="popup__type">' + window.data.nLists[cardNum].offer.type + '</h4>');
       artickleCard.insertAdjacentHTML('beforeend', '<p class="popup__text popup__text--capacity">' + window.data.nLists[cardNum].offer.rooms + ' комнаты для ' + window.data.nLists[cardNum].offer.guests + ' гостей</p>');
       artickleCard.insertAdjacentHTML('beforeend', '<p class="popup__text popup__text--time">Заезд после ' + window.data.nLists[cardNum].offer.checkin + ', выезд до ' + window.data.nLists[cardNum].offer.checkout + '</p>');
-      if (window.data.nLists[cardNum].offer.features !== 'There is no features.') {
+      if (window.data.nLists[cardNum].offer.features !== 'There is no features.' && window.data.nLists[cardNum].offer.features !== 'washer') {
         var featurelList = document.createElement('ul');
         featurelList.className = 'popup__features';
 

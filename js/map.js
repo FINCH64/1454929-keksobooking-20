@@ -20,8 +20,7 @@
   var bigPin = document.querySelector('.map__pin--main');
   var bigPinClicked = false;
   var sum1 = 0;
-
-  function manageStartForm(manage) {
+  window.activate = function (manage) {
     var userForm = document.querySelector('.ad-form');
     var mapFilterElement = document.querySelectorAll('.map__filter');
     var mapFilters = document.querySelector('.map__filters');
@@ -30,40 +29,65 @@
     var h2Map = mapOverlay.querySelector('h2');
     var promo = document.querySelector('.promo');
     var main = document.querySelector('main');
-    mapOverlay.removeChild(h2Map);
-    while (promo.firstChild) {
-      promo.removeChild(promo.firstChild);
+    if (manage === 'activate1') {
+      mapOverlay.removeChild(h2Map);
+      while (promo.firstChild) {
+        promo.removeChild(promo.firstChild);
+      }
+      main.removeChild(promo);
+      managingForm(mapFilterElement);
+      managingForm(userAvatar);
+      managingForm(userFormElements);
+    } else if (manage === 'disable') {
+      for (var i = 0; i < window.data.nLists.length; i++) {
+        var numPin = '#map_pin_n_' + i;
+        var del2Pin = document.querySelector(numPin);
+        del2Pin.remove();
+      }
+      managingForm(mapFilterElement);
+      managingForm(userAvatar);
+      managingForm(userFormElements);
+    } else if (manage === 'activate') {
+      managingForm(mapFilterElement);
+      managingForm(userAvatar);
+      managingForm(userFormElements);
     }
-    main.removeChild(promo);
     function managingForm(arr) {
-      if (manage === 'activate') {
+      if (manage === 'activate' || manage === 'activate1') {
         window.main.map.classList.remove('map--faded');
         userForm.classList.remove('ad-form--disabled');
         mapFilters.classList.remove('ad-form--disabled');
         arr.forEach(function (el) {
           el.disabled = false;
         });
+        window.map.activated = true;
       } else {
         mapFilters.classList.add('ad-form--disabled');
+        userForm.classList.add('ad-form--disabled');
+        window.main.map.classList.add('map--faded');
         arr.forEach(function (el) {
           el.disabled = true;
         });
+        window.map.activated = false;
       }
     }
-    managingForm(mapFilterElement);
-    managingForm(userAvatar);
-    managingForm(userFormElements);
-  }
-
+  };
   bigPin.addEventListener('mousedown', function (evt) {
     var addressY = 0;
     var addressX = 0;
     bigPinClicked = true;
     window.main.address.value = PIN_X_START + ', ' + PIN_Y_START;
-    if (evt.button === MOUSE_LEFT_BUTTON && sum1 === 0) {
-      manageStartForm('activate');
-      window.pin.createDOMElement();
-      sum1++;
+    window.map.addressX = PIN_X_START;
+    window.map.addressY = PIN_Y_START;
+    if (window.map.activated === false) {
+      if (evt.button === MOUSE_LEFT_BUTTON && sum1 === 0) {
+        window.activate('activate1');
+        window.pin.createDOMElement();
+        sum1++;
+      } else if (evt.button === MOUSE_LEFT_BUTTON) {
+        window.activate('activate');
+        window.pin.createDOMElement();
+      }
     }
     mapOverlay.addEventListener('mousemove', function (adressMousemoveEvt) {
       if (bigPinClicked) {
@@ -91,6 +115,8 @@
           addressX = LEFT_X_BODER;
           bigPin.style.left = -window.data.PINXSIZE / 2 + 'px';
         }
+        window.map.addressX = addressX;
+        window.map.addressY = addressY;
         window.main.address.value = addressX + ', ' + addressY;
       }
     });
@@ -110,7 +136,7 @@
   bigPin.addEventListener('keydown', function (evt) {
     if (evt.key === KEYBOARD_KEYS.enter) {
       window.main.address.value = PIN_X_START + ', ' + PIN_Y_START;
-      manageStartForm('activate');
+      window.activate('activate');
       window.pin.createDOMElement();
     }
   });
@@ -178,6 +204,9 @@
           }
         });
       });
-    }
+    },
+    activated: false,
+    pinXStart: PIN_X_START,
+    pinYStart: PIN_Y_START,
   };
 })();
