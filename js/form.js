@@ -15,14 +15,23 @@
   var reset = document.querySelector('.ad-form__reset');
   var currentMinPrice = 5000;
   var address = document.querySelector('#address');
+  var priceValidity = false;
+  var title = document.querySelector('#title');
+  var titleValidity = false;
+  var avatarInput = document.querySelector('#avatar');
+  var timein = document.querySelector('#timein');
+  var timeout = document.querySelector('#timeout');
+  var currentCapacity = document.querySelector('#capacity');
+  var roomNumber = document.querySelector('#room_number');
+  var blockCapacity = currentCapacity.querySelectorAll('option');
 
   function errMessageCreator() {
     var errDiv = document.createElement('div');
-    errDiv.className = 'error';
+    var errButton = document.createElement('button');
     var errP = document.createElement('p');
+    errDiv.className = 'error';
     errP.className = 'error__message';
     errP.textContent = 'Ошибка загрузки объявления';
-    var errButton = document.createElement('button');
     errButton.className = 'error_button';
     errButton.textContent = 'Попробовать снова';
     errDiv.appendChild(errP);
@@ -40,8 +49,8 @@
   }
   function sucessMessageCreator() {
     var sucDiv = document.createElement('div');
-    sucDiv.className = 'success';
     var sucP = document.createElement('p');
+    sucDiv.className = 'success';
     sucP.className = 'success__message';
     sucP.innerHTML = 'Ваше объявление<br>успешно размещено!';
     sucDiv.appendChild(sucP);
@@ -64,9 +73,9 @@
   }
 
   submitButton.addEventListener('click', function (evt) {
+    var form = document.querySelector('.ad-form');
     bigPin.style.top = 375 + 'px';
     bigPin.style.left = 570 + 'px';
-    var form = document.querySelector('.ad-form');
     if (priceValidity === true && titleValidity === true) {
       window.upload(new FormData(form), function () {
         sucessMessageCreator();
@@ -76,7 +85,7 @@
       evt.preventDefault();
     }
   });
-  var priceValidity = false;
+
   priceInput.addEventListener('input', function () {
     var priceValue = priceInput.value;
     if (priceValue < currentMinPrice) {
@@ -91,8 +100,7 @@
     }
   });
 
-  var title = document.querySelector('#title');
-  var titleValidity = false;
+
   title.addEventListener('change', function () {
     switch (true) {
       case title.value.length < 30:
@@ -129,12 +137,8 @@
     }
   });
 
-
-  var avatarInput = document.querySelector('#avatar');
   avatarInput.accept = 'img/jpeg, img/svg';
 
-  var timein = document.querySelector('#timein');
-  var timeout = document.querySelector('#timeout');
 
   timein.addEventListener('change', function () {
     timeout.value = timein.value;
@@ -145,9 +149,6 @@
     timein.value = timeout.value;
   });
 
-  var currentCapacity = document.querySelector('#capacity');
-  var roomNumber = document.querySelector('#room_number');
-  var blockCapacity = currentCapacity.querySelectorAll('option');
   blockCapacity[0].disabled = true;
   blockCapacity[2].disabled = false;
   blockCapacity[1].disabled = true;

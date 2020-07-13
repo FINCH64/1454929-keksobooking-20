@@ -20,15 +20,17 @@
   var bigPin = document.querySelector('.map__pin--main');
   var bigPinClicked = false;
   var sum1 = 0;
+  var housingType = document.querySelector('#housing-type');
+  var userForm = document.querySelector('.ad-form');
+  var mapFilterElement = document.querySelectorAll('.map__filter');
+  var mapFilters = document.querySelector('.map__filters');
+  var userAvatar = document.querySelectorAll('#avatar');
+  var userFormElements = document.querySelectorAll('.ad-form__element');
+  var h2Map = mapOverlay.querySelector('h2');
+  var promo = document.querySelector('.promo');
+  var main = document.querySelector('main');
+
   window.activate = function (manage) {
-    var userForm = document.querySelector('.ad-form');
-    var mapFilterElement = document.querySelectorAll('.map__filter');
-    var mapFilters = document.querySelector('.map__filters');
-    var userAvatar = document.querySelectorAll('#avatar');
-    var userFormElements = document.querySelectorAll('.ad-form__element');
-    var h2Map = mapOverlay.querySelector('h2');
-    var promo = document.querySelector('.promo');
-    var main = document.querySelector('main');
     if (manage === 'activate1') {
       mapOverlay.removeChild(h2Map);
       while (promo.firstChild) {
@@ -82,11 +84,11 @@
     if (window.map.activated === false) {
       if (evt.button === MOUSE_LEFT_BUTTON && sum1 === 0) {
         window.activate('activate1');
-        window.pin.createDOMElement();
+        window.pin.createDOMElement(window.data.nLists);
         sum1++;
       } else if (evt.button === MOUSE_LEFT_BUTTON) {
         window.activate('activate');
-        window.pin.createDOMElement();
+        window.pin.createDOMElement(window.data.nLists);
       }
     }
     mapOverlay.addEventListener('mousemove', function (adressMousemoveEvt) {
@@ -137,29 +139,29 @@
     if (evt.key === KEYBOARD_KEYS.enter) {
       window.main.address.value = PIN_X_START + ', ' + PIN_Y_START;
       window.activate('activate');
-      window.pin.createDOMElement();
+      window.pin.createDOMElement(window.data.nLists);
     }
   });
-  function activateTemplate(evt, type) {
+  function activateTemplate(evt, type, array) {
     var mapPins = document.querySelector('.map__pins');
-    var article = window.main.map.querySelector('article');
+    var article = window.main.map.querySelector('.map__card');
     if (article !== null && article !== undefined) {
       article.remove();
       mapPins.querySelector('.map__pin--active').classList.remove('map__pin--active');
     }
 
     if (type === 'click') {
-      for (var a = 0; a < window.data.nLists.length; a++) {
+      for (var a = 0; a < array.length; a++) {
         if (evt.path[1].id === 'map_pin_n_' + a) {
-          window.card.renderCard(a);
+          window.card.renderCard(a, array);
           evt.path[1].className = 'map__pin map__pin--active';
           break;
         }
       }
     } else {
-      for (var b = 0; b < window.data.nLists.length; b++) {
+      for (var b = 0; b < array.length; b++) {
         if (evt.path[0].id === 'map_pin_n_' + b) {
-          window.card.renderCard(b);
+          window.card.renderCard(b, array);
           evt.path[0].className = 'map__pin map__pin--active';
           break;
         }
@@ -185,22 +187,60 @@
     }
 
   }
+  var counter = 0;
+  housingType.addEventListener('change', function () {
+    switch (counter) {
+      case 0:
+        var mapPins = document.querySelector('.map__pins');
+        var article = window.main.map.querySelector('.map__card');
+        if (article !== null && article !== undefined) {
+          article.remove();
+          mapPins.querySelector('.map__pin--active').classList.remove('map__pin--active');
+        }
 
+        for (var i = 0; i < window.data.nLists.length; i++) {
+          var numPin = '#map_pin_n_' + i;
+          var del2Pin = document.querySelector(numPin);
+          del2Pin.remove();
+        }
+        break;
+      default:
+        mapPins = document.querySelector('.map__pins');
+        article = window.main.map.querySelector('.map__card');
+        if (article !== null && article !== undefined) {
+          article.remove();
+          mapPins.querySelector('.map__pin--active').classList.remove('map__pin--active');
+        }
+
+        for (i = 0; i < window.map.newArray.length; i++) {
+          numPin = '#map_pin_n_' + i;
+          del2Pin = document.querySelector(numPin);
+          del2Pin.remove();
+        }
+        break;
+    }
+    var newArray = window.data.fullData.filter(function (element) {
+      return element.offer.type === housingType.value;
+    });
+    window.map.newArray = newArray;
+    window.pin.createDOMElement(newArray);
+    counter++;
+  });
 
   window.map = {
-    activateCards: function () {
+    activateCards: function (arr) {
       var mapPins2 = [];
-      for (var z = 0; z < window.data.nLists.length; z++) {
+      for (var z = 0; z < arr.length; z++) {
         var mapPin2 = document.querySelector('#map_pin_n_' + z);
         mapPins2.push(mapPin2);
       }
       mapPins2.forEach(function (pin) {
         pin.addEventListener('click', function (evt3) {
-          activateTemplate(evt3, ACTION_TYPE.click);
+          activateTemplate(evt3, ACTION_TYPE.click, arr);
         });
         pin.addEventListener('keyup', function (evt4) {
           if (evt4.key === KEYBOARD_KEYS.enter) {
-            activateTemplate(evt4, ACTION_TYPE.key);
+            activateTemplate(evt4, ACTION_TYPE.key, arr);
           }
         });
       });

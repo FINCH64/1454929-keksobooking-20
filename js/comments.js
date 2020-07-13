@@ -68,3 +68,15 @@
 //   },
 // };
 // window.data.uList = uList;
+
+
+// function createFilteredArray(sourceArray) {
+//   var filterArray = [];
+//   for (var s = 0; s < 5; s++) {
+//     var counter = sourceArray.length;
+//     var d = getRandomInt(0, counter - 1);
+//     filterArray.unshift(sourceArray[d]);
+//     sourceArray.splice(d, 1);
+//   }
+//   console.log(1);
+// }
