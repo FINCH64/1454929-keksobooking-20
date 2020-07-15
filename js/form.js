@@ -193,7 +193,6 @@
     }
   });
   reset.addEventListener('click', function () {
-    console.log(currentCapacity.value);
     currentCapacity.value = '1';
     address.value = window.map.pinXStart + ', ' + window.map.pinYStart;
     bigPin.style.top = 375 + 'px';
