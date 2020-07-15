@@ -55,21 +55,27 @@
     sucP.innerHTML = 'Ваше объявление<br>успешно размещено!';
     sucDiv.appendChild(sucP);
     window.main.map.appendChild(sucDiv);
-    document.addEventListener('click', function () {
-      window.main.map.removeChild(sucDiv);
-      reset.click();
-      window.activate('disable');
-    });
+
+    document.addEventListener('mousedown', function () {
+      if (!window.main.map.sucDiv) {
+        var removingDiv = document.querySelector('.success');
+        console.log(removingDiv);
+        window.main.map.removeChild(removingDiv);
+        reset.click();
+        window.activate('disable');
+      }
+    }, {once: true});
 
     document.addEventListener('keydown', function (evt) {
       if (evt.key === 'Escape') {
         if (!window.main.map.sucDiv) {
-          window.main.map.removeChild(sucDiv);
+          var removingDiv = document.querySelector('.success');
+          window.main.map.removeChild(removingDiv);
           reset.click();
           window.activate('disable');
         }
       }
-    });
+    }, {once: true});
   }
 
   submitButton.addEventListener('click', function (evt) {

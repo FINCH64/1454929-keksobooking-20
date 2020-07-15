@@ -8,6 +8,9 @@
     click: 'click',
     key: 'key',
   };
+  var ANY = 100000;
+  var HIGHEST_PRICE = 10000001;
+  var LOWEST_PRICE = 0;
   var MOUSE_LEFT_BUTTON = 0;
   var X_GAP = 5;
   var LEFT_X_BODER = 0;
@@ -21,6 +24,10 @@
   var bigPinClicked = false;
   var sum1 = 0;
   var housingType = document.querySelector('#housing-type');
+  var housingPrice = document.querySelector('#housing-price');
+  var housingRooms = document.querySelector('#housing-rooms');
+  var housingGuests = document.querySelector('#housing-guests');
+  var housingFeatures = document.querySelector('#housing-features');
   var userForm = document.querySelector('.ad-form');
   var mapFilterElement = document.querySelectorAll('.map__filter');
   var mapFilters = document.querySelector('.map__filters');
@@ -29,6 +36,17 @@
   var h2Map = mapOverlay.querySelector('h2');
   var promo = document.querySelector('.promo');
   var main = document.querySelector('main');
+  var roomsHandler = ANY;
+  var guestsHandler = ANY;
+  var typeHandler = 'any';
+  var filterWiFI = document.querySelector('#filter-wifi');
+  var filterDishwasher = document.querySelector('#filter-dishwasher');
+  var filterParking = document.querySelector('#filter-parking');
+  var filterWasher = document.querySelector('#filter-washer');
+  var filterElevator = document.querySelector('#filter-elevator');
+  var filterConditioner = document.querySelector('#filter-conditioner');
+  var filterFeaturesArray = [];
+
 
   window.activate = function (manage) {
     if (manage === 'activate1') {
@@ -135,6 +153,7 @@
     });
 
   });
+
   bigPin.addEventListener('keydown', function (evt) {
     if (evt.key === KEYBOARD_KEYS.enter) {
       window.main.address.value = PIN_X_START + ', ' + PIN_Y_START;
@@ -142,6 +161,7 @@
       window.pin.createDOMElement(window.data.nLists);
     }
   });
+
   function activateTemplate(evt, type, array) {
     var mapPins = document.querySelector('.map__pins');
     var article = window.main.map.querySelector('.map__card');
@@ -188,7 +208,16 @@
 
   }
   var counter = 0;
-  housingType.addEventListener('change', function () {
+  var lowestPriceHolder = LOWEST_PRICE;
+  var highestPriceHolder = HIGHEST_PRICE;
+
+  function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function filterChange(filteringArray) {
     switch (counter) {
       case 0:
         var mapPins = document.querySelector('.map__pins');
@@ -219,12 +248,301 @@
         }
         break;
     }
-    var newArray = window.data.fullData.filter(function (element) {
-      return element.offer.type === housingType.value;
+
+    var newArray = filteringArray.filter(function (element) {
+      return (typeHandler === 'any' || element.offer.type === typeHandler) &&
+             element.offer.price < highestPriceHolder &&
+             element.offer.price > lowestPriceHolder &&
+            (roomsHandler === ANY || element.offer.rooms === roomsHandler) &&
+            (guestsHandler === ANY || element.offer.guests === guestsHandler);
+
     });
+    if (newArray.length > 5) {
+      var nArray = [];
+      nArray = newArray;
+      var filteredArray = [];
+      for (var z = 0; z < 5; z++) {
+        var count = nArray.length;
+        var a = getRandomInt(0, count - 1);
+        filteredArray.unshift(newArray[a]);
+        nArray.splice(a, 1);
+      }
+      newArray = filteredArray;
+    }
     window.map.newArray = newArray;
     window.pin.createDOMElement(newArray);
     counter++;
+  }
+
+  housingType.addEventListener('change', function () {
+    switch (housingType.value) {
+      case 'house':
+        typeHandler = 'house';
+        break;
+      case 'bungalo':
+        typeHandler = 'bungalo';
+        break;
+      case 'palace':
+        typeHandler = 'palace';
+        break;
+      case 'flat':
+        typeHandler = 'flat';
+        break;
+      case 'any':
+        typeHandler = 'any';
+        break;
+    }
+    filterChange(window.map.renderArray);
+  });
+
+  housingPrice.addEventListener('change', function () {
+    switch (housingPrice.value) {
+      case 'low':
+        lowestPriceHolder = 0;
+        highestPriceHolder = 10001;
+        break;
+      case 'middle':
+        lowestPriceHolder = 9999;
+        highestPriceHolder = 50001;
+        break;
+      case 'high':
+        lowestPriceHolder = 49999;
+        highestPriceHolder = 1000001;
+        break;
+      case 'any':
+        lowestPriceHolder = LOWEST_PRICE;
+        highestPriceHolder = HIGHEST_PRICE;
+        break;
+    }
+    filterChange(window.map.renderArray);
+  });
+
+  housingRooms.addEventListener('change', function () {
+    switch (housingRooms.value) {
+      case '1':
+        roomsHandler = 1;
+        break;
+      case '2':
+        roomsHandler = 2;
+        break;
+      case '3':
+        roomsHandler = 3;
+        break;
+      case 'any':
+        roomsHandler = ANY;
+        break;
+    }
+    filterChange(window.map.renderArray);
+  });
+
+  housingGuests.addEventListener('change', function () {
+    switch (housingGuests.value) {
+      case '0':
+        guestsHandler = 0;
+        break;
+      case '1':
+        guestsHandler = 1;
+        break;
+      case '2':
+        guestsHandler = 2;
+        break;
+      case 'any':
+        guestsHandler = ANY;
+        break;
+    }
+    filterChange(window.map.renderArray);
+  });
+
+  function checkForElement(filterName) {
+    if (filterName.checked && filterFeaturesArray[0] !== filterName.value) {
+      filterFeaturesArray.unshift(filterName.value);
+    } else {
+      filterFeaturesArray.forEach(function (el, index) {
+        if (el === filterName.value) {
+          filterFeaturesArray.splice(index, 1);
+        }
+      });
+    }
+    window.map.filterFeaturesArray = filterFeaturesArray;
+  }
+
+  function checkFeatures() {
+    var filterFeatures = window.map.filterFeaturesArray;
+    var firstArray = window.data.fullData.filter(function (el) {
+      var a = 0;
+      el.offer.features.every(function (dataFeature) {
+        if (dataFeature === filterFeatures[0]) {
+          a++;
+          return false;
+        } else {
+          return true;
+        }
+      });
+      return a > 0;
+    });
+
+
+    var secondArray = window.data.fullData.filter(function (el) {
+      var a = 0;
+      el.offer.features.every(function (dataFeature) {
+        if (dataFeature === filterFeatures[1]) {
+          a++;
+          return false;
+        } else {
+          return true;
+        }
+      });
+      return a > 0;
+    });
+    var thirdArray = window.data.fullData.filter(function (el) {
+      var a = 0;
+      el.offer.features.every(function (dataFeature) {
+        if (dataFeature === filterFeatures[2]) {
+          a++;
+          return false;
+        } else {
+          return true;
+        }
+      });
+      return a > 0;
+    });
+    var fourthArray = window.data.fullData.filter(function (el) {
+      var a = 0;
+      el.offer.features.every(function (dataFeature) {
+        if (dataFeature === filterFeatures[3]) {
+          a++;
+          return false;
+        } else {
+          return true;
+        }
+      });
+      return a > 0;
+    });
+    var fifthArray = window.data.fullData.filter(function (el) {
+      var a = 0;
+      el.offer.features.every(function (dataFeature) {
+        if (dataFeature === filterFeatures[4]) {
+          a++;
+          return false;
+        } else {
+          return true;
+        }
+      });
+      return a > 0;
+    });
+    var sixsArray = window.data.fullData.filter(function (el) {
+      var a = 0;
+      el.offer.features.every(function (dataFeature) {
+        if (dataFeature === filterFeatures[5]) {
+          a++;
+          return false;
+        } else {
+          return true;
+        }
+      });
+      return a > 0;
+    });
+
+    var allFilters = [
+      firstArray,
+      secondArray,
+      thirdArray,
+      fourthArray,
+      fifthArray,
+      sixsArray
+    ];
+    var max = -Infinity;
+    var index = -1;
+    allFilters.forEach(function (a, i) {
+      if (a.length > max) {
+        max = a.length;
+        index = i;
+      }
+    });
+    var maxLengthArray = allFilters[index].map(function (obj) {
+      return obj;
+    });
+    allFilters[index] = [];
+    var rating = 0;
+    var filteredWithRating = [];
+    var ratingObj = {};
+    maxLengthArray.forEach(function (totalEl) {
+      allFilters.forEach(function (filterArr) {
+        filterArr.every(function (filterEl) {
+          if (totalEl === filterEl) {
+            rating++;
+            return false;
+          } else {
+            return true;
+          }
+        });
+      });
+      ratingObj.rating = rating;
+      ratingObj.array = totalEl;
+      filteredWithRating.unshift(ratingObj);
+      ratingObj = {};
+      rating = 0;
+    });
+    filteredWithRating.sort(function (a, b) {
+      if (a.rating < b.rating) {
+        return 1;
+      }
+      if (a.rating > b.rating) {
+        return -1;
+      }
+      return 0;
+    });
+    if (filterFeaturesArray.length !== 0) {
+      var maxRating = filteredWithRating[0].rating;
+      var sortedArray = filteredWithRating.filter(function (element) {
+        return element.rating === maxRating;
+      });
+      if (sortedArray.length > 5) {
+        var lastArray = sortedArray.splice(0, 5);
+      } else {
+        lastArray = sortedArray;
+      }
+      var readyArray = lastArray.map(function (el) {
+        return el.array;
+      });
+    }
+    if (filterFeaturesArray.length !== 0) {
+      window.map.renderArray = readyArray;
+    } else {
+      window.map.renderArray = window.data.fullData;
+    }
+  }
+
+  filterWiFI.addEventListener('change', function () {
+    checkForElement(filterWiFI);
+    checkFeatures();
+    filterChange(window.map.renderArray);
+  });
+
+  filterDishwasher.addEventListener('change', function () {
+    checkForElement(filterDishwasher);
+    checkFeatures();
+    filterChange(window.map.renderArray);
+  });
+  filterParking.addEventListener('change', function () {
+    checkForElement(filterParking);
+    checkFeatures();
+    filterChange(window.map.renderArray);
+  });
+  filterWasher.addEventListener('change', function () {
+    checkForElement(filterWasher);
+    checkFeatures();
+    filterChange(window.map.renderArray);
+  });
+  filterElevator.addEventListener('change', function () {
+    checkForElement(filterElevator);
+    checkFeatures();
+    filterChange(window.map.renderArray);
+  });
+  filterConditioner.addEventListener('change', function () {
+    checkForElement(filterConditioner);
+    checkFeatures();
+    filterChange(window.map.renderArray);
   });
 
   window.map = {

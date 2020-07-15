@@ -35,9 +35,7 @@
       nLists: filteredArray,
       fullData: fullData,
     };
-    function createTestLists() {
-    }
-    createTestLists();
+    window.map.renderArray = window.data.fullData;
   };
 
   window.load('https://javascript.pages.academy/keksobooking/data', onSuccess, onError);
