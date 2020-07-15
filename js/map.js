@@ -27,7 +27,6 @@
   var housingPrice = document.querySelector('#housing-price');
   var housingRooms = document.querySelector('#housing-rooms');
   var housingGuests = document.querySelector('#housing-guests');
-  var housingFeatures = document.querySelector('#housing-features');
   var userForm = document.querySelector('.ad-form');
   var mapFilterElement = document.querySelectorAll('.map__filter');
   var mapFilters = document.querySelector('.map__filters');
@@ -274,7 +273,7 @@
     counter++;
   }
 
-  housingType.addEventListener('change', function () {
+  housingType.addEventListener('change', window.debounce(function () {
     switch (housingType.value) {
       case 'house':
         typeHandler = 'house';
@@ -293,9 +292,9 @@
         break;
     }
     filterChange(window.map.renderArray);
-  });
+  }));
 
-  housingPrice.addEventListener('change', function () {
+  housingPrice.addEventListener('change', window.debounce(function () {
     switch (housingPrice.value) {
       case 'low':
         lowestPriceHolder = 0;
@@ -315,9 +314,9 @@
         break;
     }
     filterChange(window.map.renderArray);
-  });
+  }));
 
-  housingRooms.addEventListener('change', function () {
+  housingRooms.addEventListener('change', window.debounce(function () {
     switch (housingRooms.value) {
       case '1':
         roomsHandler = 1;
@@ -333,9 +332,9 @@
         break;
     }
     filterChange(window.map.renderArray);
-  });
+  }));
 
-  housingGuests.addEventListener('change', function () {
+  housingGuests.addEventListener('change', window.debounce(function () {
     switch (housingGuests.value) {
       case '0':
         guestsHandler = 0;
@@ -351,7 +350,7 @@
         break;
     }
     filterChange(window.map.renderArray);
-  });
+  }));
 
   function checkForElement(filterName) {
     if (filterName.checked && filterFeaturesArray[0] !== filterName.value) {
@@ -513,37 +512,37 @@
     }
   }
 
-  filterWiFI.addEventListener('change', function () {
+  filterWiFI.addEventListener('change', window.debounce(function () {
     checkForElement(filterWiFI);
     checkFeatures();
     filterChange(window.map.renderArray);
-  });
+  }));
 
-  filterDishwasher.addEventListener('change', function () {
+  filterDishwasher.addEventListener('change', window.debounce(function () {
     checkForElement(filterDishwasher);
     checkFeatures();
     filterChange(window.map.renderArray);
-  });
-  filterParking.addEventListener('change', function () {
+  }));
+  filterParking.addEventListener('change', window.debounce(function () {
     checkForElement(filterParking);
     checkFeatures();
     filterChange(window.map.renderArray);
-  });
-  filterWasher.addEventListener('change', function () {
+  }));
+  filterWasher.addEventListener('change', window.debounce(function () {
     checkForElement(filterWasher);
     checkFeatures();
     filterChange(window.map.renderArray);
-  });
-  filterElevator.addEventListener('change', function () {
+  }));
+  filterElevator.addEventListener('change', window.debounce(function () {
     checkForElement(filterElevator);
     checkFeatures();
     filterChange(window.map.renderArray);
-  });
-  filterConditioner.addEventListener('change', function () {
+  }));
+  filterConditioner.addEventListener('change', window.debounce(function () {
     checkForElement(filterConditioner);
     checkFeatures();
     filterChange(window.map.renderArray);
-  });
+  }));
 
   window.map = {
     activateCards: function (arr) {

@@ -59,7 +59,6 @@
     document.addEventListener('mousedown', function () {
       if (!window.main.map.sucDiv) {
         var removingDiv = document.querySelector('.success');
-        console.log(removingDiv);
         window.main.map.removeChild(removingDiv);
         reset.click();
         window.activate('disable');
@@ -194,6 +193,8 @@
     }
   });
   reset.addEventListener('click', function () {
+    console.log(currentCapacity.value);
+    currentCapacity.value = '1';
     address.value = window.map.pinXStart + ', ' + window.map.pinYStart;
     bigPin.style.top = 375 + 'px';
     bigPin.style.left = 570 + 'px';
