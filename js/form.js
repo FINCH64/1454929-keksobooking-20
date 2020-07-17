@@ -26,40 +26,45 @@
   var blockCapacity = currentCapacity.querySelectorAll('option');
 
   function errMessageCreator() {
-    var errDiv = document.createElement('div');
-    var errButton = document.createElement('button');
-    var errP = document.createElement('p');
-    errDiv.className = 'error';
-    errP.className = 'error__message';
-    errP.textContent = 'Ошибка загрузки объявления';
-    errButton.className = 'error_button';
-    errButton.textContent = 'Попробовать снова';
-    errDiv.appendChild(errP);
-    errDiv.appendChild(errButton);
-    window.main.map.appendChild(errDiv);
+    var errorMessage = document.createElement('div');
+    var errorMessageButton = document.createElement('button');
+    var errorMessageText = document.createElement('p');
+    errorMessage.className = 'error';
+    errorMessageText.className = 'error__message';
+    errorMessageText.textContent = 'Ошибка загрузки объявления';
+    errorMessageButton.className = 'error_button';
+    errorMessageButton.textContent = 'Попробовать снова';
+    errorMessage.appendChild(errorMessageText);
+    errorMessage.appendChild(errorMessageButton);
+    window.main.map.appendChild(errorMessage);
+
     document.addEventListener('click', function () {
-      window.main.map.removeChild(errDiv);
-    });
+      if (!window.main.map.errorMessage) {
+        window.main.map.removeChild(errorMessage);
+      }
+    }, {once: true});
 
     document.addEventListener('keydown', function (evt) {
-      if (evt.key === 'Escape') {
-        window.main.map.removeChild(errDiv);
+      if (!window.main.map.errorMessage) {
+        if (evt.key === 'Escape') {
+          window.main.map.removeChild(errorMessage);
+        }
       }
-    });
+    }, {once: true});
   }
   function sucessMessageCreator() {
-    var sucDiv = document.createElement('div');
-    var sucP = document.createElement('p');
-    sucDiv.className = 'success';
-    sucP.className = 'success__message';
-    sucP.innerHTML = 'Ваше объявление<br>успешно размещено!';
-    sucDiv.appendChild(sucP);
-    window.main.map.appendChild(sucDiv);
+    var sucessMessage = document.createElement('div');
+    var sucessMessageText = document.createElement('p');
+    sucessMessage.className = 'success';
+    sucessMessageText.className = 'success__message';
+    sucessMessageText.innerHTML = 'Ваше объявление<br>успешно размещено!';
+    sucessMessage.appendChild(sucessMessageText);
+    window.main.map.appendChild(sucessMessage);
 
     document.addEventListener('mousedown', function () {
-      if (!window.main.map.sucDiv) {
-        var removingDiv = document.querySelector('.success');
-        window.main.map.removeChild(removingDiv);
+      if (!window.main.map.sucessMessage) {
+        var removingMessage = document.querySelector('.success');
+        window.main.map.removeChild(removingMessage);
         reset.click();
         window.activate('disable');
       }
@@ -67,9 +72,9 @@
 
     document.addEventListener('keydown', function (evt) {
       if (evt.key === 'Escape') {
-        if (!window.main.map.sucDiv) {
-          var removingDiv = document.querySelector('.success');
-          window.main.map.removeChild(removingDiv);
+        if (!window.main.map.sucessMessage) {
+          var removingMessage = document.querySelector('.success');
+          window.main.map.removeChild(removingMessage);
           reset.click();
           window.activate('disable');
         }

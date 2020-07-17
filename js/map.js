@@ -1,14 +1,14 @@
 'use strict';
 (function () {
-  var KEYBOARD_KEYS = {
-    esc: 'Escape',
-    enter: 'Enter',
+  var KeyboardKey = {
+    ESC: 'Escape',
+    ENTER: 'Enter',
   };
-  var ACTION_TYPE = {
-    click: 'click',
-    key: 'key',
+  var ActionType = {
+    CLICK: 'click',
+    KEY: 'key',
   };
-  var ANY = 100000;
+  var ANY_VALUE_FLAG = 100000;
   var HIGHEST_PRICE = 10000001;
   var LOWEST_PRICE = 0;
   var MOUSE_LEFT_BUTTON = 0;
@@ -35,8 +35,8 @@
   var h2Map = mapOverlay.querySelector('h2');
   var promo = document.querySelector('.promo');
   var main = document.querySelector('main');
-  var roomsHandler = ANY;
-  var guestsHandler = ANY;
+  var roomsHandler = ANY_VALUE_FLAG;
+  var guestsHandler = ANY_VALUE_FLAG;
   var typeHandler = 'any';
   var filterWiFI = document.querySelector('#filter-wifi');
   var filterDishwasher = document.querySelector('#filter-dishwasher');
@@ -154,7 +154,7 @@
   });
 
   bigPin.addEventListener('keydown', function (evt) {
-    if (evt.key === KEYBOARD_KEYS.enter) {
+    if (evt.key === KeyboardKey.ENTER) {
       window.main.address.value = PIN_X_START + ', ' + PIN_Y_START;
       window.activate('activate');
       window.pin.createDOMElement(window.data.nLists);
@@ -198,7 +198,7 @@
       });
 
       document.addEventListener('keydown', function (adressMousemoveEvt) {
-        if (adressMousemoveEvt.key === KEYBOARD_KEYS.esc) {
+        if (adressMousemoveEvt.key === KeyboardKey.ESC) {
           article2.remove();
           activePin.classList.remove('map__pin--active');
         }
@@ -252,8 +252,8 @@
       return (typeHandler === 'any' || element.offer.type === typeHandler) &&
              element.offer.price < highestPriceHolder &&
              element.offer.price > lowestPriceHolder &&
-            (roomsHandler === ANY || element.offer.rooms === roomsHandler) &&
-            (guestsHandler === ANY || element.offer.guests === guestsHandler);
+            (roomsHandler === ANY_VALUE_FLAG || element.offer.rooms === roomsHandler) &&
+            (guestsHandler === ANY_VALUE_FLAG || element.offer.guests === guestsHandler);
 
     });
     if (newArray.length > 5) {
@@ -328,7 +328,7 @@
         roomsHandler = 3;
         break;
       case 'any':
-        roomsHandler = ANY;
+        roomsHandler = ANY_VALUE_FLAG;
         break;
     }
     filterChange(window.map.renderArray);
@@ -346,7 +346,7 @@
         guestsHandler = 2;
         break;
       case 'any':
-        guestsHandler = ANY;
+        guestsHandler = ANY_VALUE_FLAG;
         break;
     }
     filterChange(window.map.renderArray);
@@ -553,11 +553,11 @@
       }
       mapPins2.forEach(function (pin) {
         pin.addEventListener('click', function (evt3) {
-          activateTemplate(evt3, ACTION_TYPE.click, arr);
+          activateTemplate(evt3, ActionType.CLICK, arr);
         });
         pin.addEventListener('keyup', function (evt4) {
-          if (evt4.key === KEYBOARD_KEYS.enter) {
-            activateTemplate(evt4, ACTION_TYPE.key, arr);
+          if (evt4.key === KeyboardKey.ENTER) {
+            activateTemplate(evt4, ActionType.KEY, arr);
           }
         });
       });

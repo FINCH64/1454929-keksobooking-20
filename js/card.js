@@ -19,17 +19,17 @@
         featurelList.className = 'popup__features';
 
         array[cardNum].offer.features.forEach(function (currentList) {
-          var li = document.createElement('li');
-          li.className = 'popup__feature popup__feature--' + currentList;
-          featurelList.appendChild(li);
+          var createdLi = document.createElement('li');
+          createdLi.className = 'popup__feature popup__feature--' + currentList;
+          featurelList.appendChild(createdLi);
         });
 
         artickleCard.appendChild(featurelList);
       }
       artickleCard.insertAdjacentHTML('beforeend', '<p class="popup__description">' + array[cardNum].offer.description + '</p>');
       if (array[cardNum].offer.photos !== 'There is no photos.') {
-        var divchik = document.createElement('div');
-        divchik.className = 'popup__photos';
+        var createdDiv = document.createElement('div');
+        createdDiv.className = 'popup__photos';
         for (var a = 0; a < array[cardNum].offer.photos.length; a++) {
           var img = document.createElement('img');
           img.src = array[cardNum].offer.photos[a];
@@ -37,9 +37,9 @@
           img.width = '45';
           img.height = '40';
           img.alt = 'Фотография жилья.';
-          divchik.appendChild(img);
+          createdDiv.appendChild(img);
         }
-        artickleCard.appendChild(divchik);
+        artickleCard.appendChild(createdDiv);
       }
       newFragment.appendChild(artickleCard);
       var mapFilters = document.querySelector('.map__filters-container');

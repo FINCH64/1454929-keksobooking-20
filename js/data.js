@@ -19,14 +19,14 @@
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    var nArray = [];
-    nArray = data;
+    var cardElements = [];
+    cardElements = data;
     var filteredArray = [];
     for (var i = 0; i < 5; i++) {
-      var count = nArray.length;
+      var count = cardElements.length;
       var a = getRandomInt(0, count - 1);
       filteredArray.unshift(data[a]);
-      nArray.splice(a, 1);
+      cardElements.splice(a, 1);
     }
 
     window.data = {
