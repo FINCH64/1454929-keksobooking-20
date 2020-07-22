@@ -24,6 +24,23 @@
   var currentCapacity = document.querySelector('#capacity');
   var roomNumber = document.querySelector('#room_number');
   var blockCapacity = currentCapacity.querySelectorAll('option');
+  var description = document.querySelector('#description');
+  var filterWiFI = document.querySelector('#filter-wifi');
+  var filterDishwasher = document.querySelector('#filter-dishwasher');
+  var filterParking = document.querySelector('#filter-parking');
+  var filterWasher = document.querySelector('#filter-washer');
+  var filterElevator = document.querySelector('#filter-elevator');
+  var filterConditioner = document.querySelector('#filter-conditioner');
+  var userFeatureWifi = document.querySelector('#feature-wifi');
+  var userFeatureDishwasher = document.querySelector('#feature-dishwasher');
+  var userFeatureParking = document.querySelector('#feature-parking');
+  var userFeatureWasher = document.querySelector('#feature-washer');
+  var userFeatureElevator = document.querySelector('#feature-elevator');
+  var userFeatureConditioner = document.querySelector('#feature-conditioner');
+  var housingType = document.querySelector('#housing-type');
+  var housingPrice = document.querySelector('#housing-price');
+  var housingRooms = document.querySelector('#housing-rooms');
+  var housingGuests = document.querySelector('#housing-guests');
 
   function errMessageCreator() {
     var errorMessage = document.createElement('div');
@@ -55,28 +72,29 @@
   function sucessMessageCreator() {
     var sucessMessage = document.createElement('div');
     var sucessMessageText = document.createElement('p');
+    var switcher = false;
     sucessMessage.className = 'success';
     sucessMessageText.className = 'success__message';
     sucessMessageText.innerHTML = 'Ваше объявление<br>успешно размещено!';
     sucessMessage.appendChild(sucessMessageText);
     window.main.map.appendChild(sucessMessage);
-
+    submitButton.disabled = true;
     document.addEventListener('mousedown', function () {
-      if (!window.main.map.sucessMessage) {
+      if (window.main.map.sucessMessage !== null && switcher === false) {
         var removingMessage = document.querySelector('.success');
         window.main.map.removeChild(removingMessage);
         reset.click();
-        window.activate('disable');
+        switcher = true;
       }
     }, {once: true});
 
     document.addEventListener('keydown', function (evt) {
       if (evt.key === 'Escape') {
-        if (!window.main.map.sucessMessage) {
+        if (window.main.map.sucessMessage !== null && switcher === false) {
           var removingMessage = document.querySelector('.success');
           window.main.map.removeChild(removingMessage);
           reset.click();
-          window.activate('disable');
+          switcher = true;
         }
       }
     }, {once: true});
@@ -197,10 +215,36 @@
         break;
     }
   });
-  reset.addEventListener('click', function () {
+  reset.addEventListener('click', function (evt) {
+    evt.preventDefault();
+    title.value = '';
+    priceInput.value = '';
     currentCapacity.value = '1';
+    roomNumber.value = '1';
+    timein.value = '12:00';
+    timeout.value = '12:00';
+    description.value = '';
     address.value = window.map.pinXStart + ', ' + window.map.pinYStart;
     bigPin.style.top = 375 + 'px';
     bigPin.style.left = 570 + 'px';
+    filterConditioner.checked = false;
+    filterDishwasher.checked = false;
+    filterElevator.checked = false;
+    filterParking.checked = false;
+    filterWasher.checked = false;
+    filterWiFI.checked = false;
+    userFeatureConditioner.checked = false;
+    userFeatureDishwasher.checked = false;
+    userFeatureElevator.checked = false;
+    userFeatureParking.checked = false;
+    userFeatureWasher.checked = false;
+    userFeatureWifi.checked = false;
+    housingGuests.value = 'any';
+    housingPrice.value = 'any';
+    housingRooms.value = 'any';
+    housingType.value = 'any';
+    window.map.filterChange(window.data.fullData);
+    window.data = null;
+    window.activate('disable');
   });
 })();

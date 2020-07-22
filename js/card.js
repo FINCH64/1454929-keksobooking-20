@@ -23,7 +23,6 @@
           createdLi.className = 'popup__feature popup__feature--' + currentList;
           featurelList.appendChild(createdLi);
         });
-
         artickleCard.appendChild(featurelList);
       }
       artickleCard.insertAdjacentHTML('beforeend', '<p class="popup__description">' + array[cardNum].offer.description + '</p>');
