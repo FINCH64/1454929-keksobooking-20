@@ -13,7 +13,7 @@
   var typeInput = document.querySelector('#type');
   var bigPin = document.querySelector('.map__pin--main');
   var reset = document.querySelector('.ad-form__reset');
-  var currentMinPrice = 5000;
+  var currentMinimalPrice = 5000;
   var address = document.querySelector('#address');
   var priceValidity = false;
   var title = document.querySelector('#title');
@@ -42,7 +42,7 @@
   var housingRooms = document.querySelector('#housing-rooms');
   var housingGuests = document.querySelector('#housing-guests');
 
-  function errMessageCreator() {
+  function errorMessageCreator() {
     var errorMessage = document.createElement('div');
     var errorMessageButton = document.createElement('button');
     var errorMessageText = document.createElement('p');
@@ -100,7 +100,7 @@
       window.upload(new FormData(form), function () {
         sucessMessageCreator();
       }, function () {
-        errMessageCreator();
+        errorMessageCreator();
       });
       evt.preventDefault();
     }
@@ -109,8 +109,8 @@
 
   var checkPriceValidity = function () {
     var priceValue = priceInput.value;
-    if (priceValue < currentMinPrice) {
-      priceInput.setCustomValidity('Цена начинается от ' + currentMinPrice + ' ₽/ночь');
+    if (priceValue < currentMinimalPrice) {
+      priceInput.setCustomValidity('Цена начинается от ' + currentMinimalPrice + ' ₽/ночь');
       priceValidity = false;
     } else if (priceValue > 1000000) {
       priceInput.setCustomValidity('Цена не может превышать 1 000 000' + ' ₽/ночь');
@@ -143,19 +143,19 @@
     switch (typeInput.value) {
       case BUNGALO:
         priceInput.placeholder = MIN_BUNGALO_PRICE;
-        currentMinPrice = MIN_BUNGALO_PRICE;
+        currentMinimalPrice = MIN_BUNGALO_PRICE;
         break;
       case PALACE:
         priceInput.placeholder = MIN_PALACE_PRICE;
-        currentMinPrice = MIN_PALACE_PRICE;
+        currentMinimalPrice = MIN_PALACE_PRICE;
         break;
       case HOUSE:
         priceInput.placeholder = MIN_HOUSE_PRICE;
-        currentMinPrice = MIN_HOUSE_PRICE;
+        currentMinimalPrice = MIN_HOUSE_PRICE;
         break;
       case FLAT:
         priceInput.placeholder = MIN_FLAT_PRICE;
-        currentMinPrice = MIN_FLAT_PRICE;
+        currentMinimalPrice = MIN_FLAT_PRICE;
         break;
     }
   };

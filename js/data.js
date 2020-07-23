@@ -11,8 +11,8 @@
 
       var onSuccess = function (data) {
 
-        var fullData = data.map(function (obj) {
-          return obj;
+        var fullData = data.map(function (object) {
+          return object;
         });
 
         function getRandomInt(min, max) {
@@ -33,7 +33,7 @@
         window.data = {
           PINXSIZE: PINXSIZE,
           PINYSIZE: PINYSIZE,
-          nLists: filteredArray,
+          newLists: filteredArray,
           fullData: fullData,
         };
         window.map.renderArray = window.data.fullData;
