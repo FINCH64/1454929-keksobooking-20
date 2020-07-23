@@ -55,52 +55,44 @@
     errorMessage.appendChild(errorMessageButton);
     window.main.map.appendChild(errorMessage);
 
-    document.addEventListener('click', function () {
-      if (!window.main.map.errorMessage) {
-        window.main.map.removeChild(errorMessage);
-      }
-    }, {once: true});
-
-    document.addEventListener('keydown', function (evt) {
-      if (!window.main.map.errorMessage) {
-        if (evt.key === 'Escape') {
+    var deleteEroorMessage = function (evt) {
+      if (evt.button === 0 || evt.key === 'Escape') {
+        if (!window.main.map.errorMessage) {
           window.main.map.removeChild(errorMessage);
         }
       }
-    }, {once: true});
+    };
+
+    document.addEventListener('click', deleteEroorMessage);
+
+    document.addEventListener('keydown', deleteEroorMessage);
   }
   function sucessMessageCreator() {
     var sucessMessage = document.createElement('div');
     var sucessMessageText = document.createElement('p');
-    var switcher = false;
     sucessMessage.className = 'success';
     sucessMessageText.className = 'success__message';
     sucessMessageText.innerHTML = 'Ваше объявление<br>успешно размещено!';
     sucessMessage.appendChild(sucessMessageText);
     window.main.map.appendChild(sucessMessage);
     submitButton.disabled = true;
-    document.addEventListener('mousedown', function () {
-      if (window.main.map.sucessMessage !== null && switcher === false) {
-        var removingMessage = document.querySelector('.success');
-        window.main.map.removeChild(removingMessage);
-        reset.click();
-        switcher = true;
-      }
-    }, {once: true});
 
-    document.addEventListener('keydown', function (evt) {
-      if (evt.key === 'Escape') {
-        if (window.main.map.sucessMessage !== null && switcher === false) {
+    var sucessMessageDeleter = function (evt) {
+      if (evt.button === 0 || evt.key === 'Escape') {
+        if (window.main.map.sucessMessage !== null) {
           var removingMessage = document.querySelector('.success');
           window.main.map.removeChild(removingMessage);
           reset.click();
-          switcher = true;
         }
       }
-    }, {once: true});
+    };
+
+    document.addEventListener('mousedown', sucessMessageDeleter);
+
+    document.addEventListener('keydown', sucessMessageDeleter);
   }
 
-  submitButton.addEventListener('click', function (evt) {
+  var submitButtonAction = function (evt) {
     var form = document.querySelector('.ad-form');
     bigPin.style.top = 375 + 'px';
     bigPin.style.left = 570 + 'px';
@@ -112,9 +104,10 @@
       });
       evt.preventDefault();
     }
-  });
+  };
+  submitButton.addEventListener('click', submitButtonAction);
 
-  priceInput.addEventListener('input', function () {
+  var checkPriceValidity = function () {
     var priceValue = priceInput.value;
     if (priceValue < currentMinPrice) {
       priceInput.setCustomValidity('Цена начинается от ' + currentMinPrice + ' ₽/ночь');
@@ -126,10 +119,11 @@
       priceValidity = true;
       priceInput.setCustomValidity('');
     }
-  });
+  };
 
+  priceInput.addEventListener('input', checkPriceValidity);
 
-  title.addEventListener('change', function () {
+  var checkTitleValidity = function () {
     switch (true) {
       case title.value.length < 30:
         titleValidity = false;
@@ -141,10 +135,11 @@
         titleValidity = true;
         break;
     }
+  };
 
-  });
+  title.addEventListener('change', checkTitleValidity);
 
-  typeInput.addEventListener('change', function () {
+  var changePricePlaceholder = function () {
     switch (typeInput.value) {
       case BUNGALO:
         priceInput.placeholder = MIN_BUNGALO_PRICE;
@@ -163,19 +158,23 @@
         currentMinPrice = MIN_FLAT_PRICE;
         break;
     }
-  });
+  };
+
+  typeInput.addEventListener('change', changePricePlaceholder);
 
   avatarInput.accept = 'img/jpeg, img/svg';
 
+  var checkTimes = function (evt) {
+    if (evt.target === timein) {
+      timeout.value = timein.value;
+    } else if (evt.target === timeout) {
+      timein.value = timeout.value;
+    }
+  };
+  timein.addEventListener('change', checkTimes);
 
-  timein.addEventListener('change', function () {
-    timeout.value = timein.value;
-  });
 
-
-  timeout.addEventListener('change', function () {
-    timein.value = timeout.value;
-  });
+  timeout.addEventListener('change', checkTimes);
 
   blockCapacity[0].disabled = true;
   blockCapacity[2].disabled = false;
@@ -184,7 +183,7 @@
   currentCapacity.selectedIndex = 2;
   window.main.address.setAttribute('readonly', true);
 
-  roomNumber.addEventListener('change', function () {
+  var checkCapacityValidity = function () {
     switch (Number(roomNumber.value)) {
       case 1:
         blockCapacity[0].disabled = true;
@@ -214,8 +213,10 @@
         currentCapacity.selectedIndex = 3;
         break;
     }
-  });
-  reset.addEventListener('click', function (evt) {
+  };
+  roomNumber.addEventListener('change', checkCapacityValidity);
+
+  var resetForm = function (evt) {
     evt.preventDefault();
     title.value = '';
     priceInput.value = '';
@@ -246,5 +247,7 @@
     window.map.filterChange(window.data.fullData);
     window.data = null;
     window.activate('disable');
-  });
+  };
+
+  reset.addEventListener('click', resetForm);
 })();

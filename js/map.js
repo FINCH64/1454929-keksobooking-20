@@ -98,23 +98,21 @@
       }
     }
   };
-
-  bigPin.addEventListener('mousedown', function (evt) {
-    window.map.bigPinClicked = true;
-    if (window.data !== null && window.data !== undefined) {
-      window.map.manageServerData(evt);
-    } else {
-      window.newData.loadFunction(evt);
+  var getServerData = function (evt) {
+    if (evt.button === MOUSE_LEFT_BUTTON || evt.key === KeyboardKey.ENTER) {
+      window.map.bigPinClicked = true;
+      if (window.data !== null && window.data !== undefined) {
+        window.map.manageServerData(evt);
+      } else {
+        window.newData.loadFunction(evt);
+      }
     }
-  });
+  };
 
-  bigPin.addEventListener('keydown', function (evt) {
-    if (evt.key === KeyboardKey.ENTER) {
-      window.main.address.value = PIN_X_START + ', ' + PIN_Y_START;
-      window.activate('activate');
-      window.pin.createDOMElement(window.data.nLists);
-    }
-  });
+  bigPin.addEventListener('mousedown', getServerData);
+
+
+  bigPin.addEventListener('keydown', getServerData);
 
   function activateTemplate(evt, type, array) {
     var mapPins = document.querySelector('.map__pins');
@@ -151,17 +149,17 @@
 
     if (article2 !== null && activePin !== null) {
       var popupClose = article2.querySelector('.popup__close');
-      popupClose.addEventListener('click', function () {
-        article2.remove();
-        activePin.classList.remove('map__pin--active');
-      });
 
-      document.addEventListener('keydown', function (adressMousemoveEvt) {
-        if (adressMousemoveEvt.key === KeyboardKey.ESC) {
+      var cardRemove = function () {
+        if (evt.button === MOUSE_LEFT_BUTTON || evt.key === KeyboardKey.ESC) {
           article2.remove();
           activePin.classList.remove('map__pin--active');
         }
-      });
+      };
+
+      popupClose.addEventListener('click', cardRemove);
+
+      document.addEventListener('keydown', cardRemove);
     }
 
   }
@@ -171,8 +169,7 @@
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
-
-  housingType.addEventListener('change', window.debounce(function () {
+  var typeFilterChangedAction = function () {
     switch (housingType.value) {
       case 'house':
         typeHandler = 'house';
@@ -191,9 +188,11 @@
         break;
     }
     window.map.filterChange(window.map.renderArray);
-  }));
+  };
 
-  housingPrice.addEventListener('change', window.debounce(function () {
+  housingType.addEventListener('change', window.debounce(typeFilterChangedAction));
+
+  var priceFilterChangedAction = function () {
     switch (housingPrice.value) {
       case 'low':
         lowestPriceHolder = 0;
@@ -213,9 +212,11 @@
         break;
     }
     window.map.filterChange(window.map.renderArray);
-  }));
+  };
 
-  housingRooms.addEventListener('change', window.debounce(function () {
+  housingPrice.addEventListener('change', window.debounce(priceFilterChangedAction));
+
+  var roomsFilterChangedAction = function () {
     switch (housingRooms.value) {
       case '1':
         roomsHandler = 1;
@@ -231,9 +232,11 @@
         break;
     }
     window.map.filterChange(window.map.renderArray);
-  }));
+  };
 
-  housingGuests.addEventListener('change', window.debounce(function () {
+  housingRooms.addEventListener('change', window.debounce(roomsFilterChangedAction));
+
+  var guestsFilterChangedAction = function () {
     switch (housingGuests.value) {
       case '0':
         guestsHandler = 0;
@@ -249,236 +252,122 @@
         break;
     }
     window.map.filterChange(window.map.renderArray);
-  }));
+  };
 
-  function checkForElement(filterName) {
-    if (filterName.checked && filterFeaturesArray[0] !== filterName.value) {
-      filterFeaturesArray.unshift(filterName.value);
+  housingGuests.addEventListener('change', window.debounce(guestsFilterChangedAction));
+
+  var featuresFilterChanged = function (evt) {
+    if (evt.target.checked && filterFeaturesArray[0] !== evt.target.value) {
+      filterFeaturesArray.unshift(evt.target.value);
     } else {
       filterFeaturesArray.forEach(function (el, index) {
-        if (el === filterName.value) {
+        if (el === evt.target.value) {
           filterFeaturesArray.splice(index, 1);
         }
       });
     }
     window.map.filterFeaturesArray = filterFeaturesArray;
-  }
 
-  function checkFeatures() {
     var filterFeatures = window.map.filterFeaturesArray;
-
-    var nnnFilters = [];
-
-    var newElement = window.data.fullData.filter(function (el) {
-      var a = 0;
-      var rrating = 0;
-      var rratedFilter = {};
-      el.offer.features.every(function (dataFeature) {
-        for (var z = 0; z < dataFeature.length; z++) {
-          for (var d = 0; d < filterFeatures.length; d++) {
-            console.log(dataFeature);
-            console.log(filterFeatures[d]);
-            if (dataFeature === filterFeatures[d]) {
-              a++;
-              rrating++;
-              return false;
-            } else if (rrating === filterFeatures.length) {
-              return false;
-            } else {
-              return true;
+    var maxRating = filterFeatures.length;
+    if (filterFeatures.length !== 0) {
+      var nnnFilters = [];
+      window.data.fullData.every(function (el) {
+        var rrating = 0;
+        var rratedFilter = {};
+        el.offer.features.every(function (dataFeature) {
+          for (var z = 0; z < dataFeature.length; z++) {
+            for (var d = 0; d < filterFeatures.length; d++) {
+              if (dataFeature === filterFeatures[d]) {
+                rrating++;
+                return true;
+              } else if (rrating === filterFeatures.length) {
+                return false;
+              }
             }
           }
+          return true;
+        });
+        if (rrating === maxRating && nnnFilters.length < 5) {
+          rratedFilter.rating = rrating;
+          rratedFilter.array = el;
+          nnnFilters.unshift(rratedFilter);
         }
         return true;
       });
-      console.log(rrating);
-      console.log(el);
-      if (rrating > 0 && nnnFilters.length < 5) {
-        rratedFilter.rating = rrating;
-        rratedFilter.array = el;
-        nnnFilters.unshift(rratedFilter);
+      var nnnReady = [];
+      for (var a = 0; a < nnnFilters.length; a++) {
+        nnnReady.unshift(nnnFilters[a].array);
       }
-      return a > 0;
-    });
-    console.log(nnnFilters);
-    console.log(newElement);
+      window.map.renderArray = nnnReady;
+    } else {
+      window.map.renderArray = window.data.fullData;
+    }
+    window.map.filterChange(window.map.renderArray);
+  };
 
-    //   var firstArray = window.data.fullData.filter(function (el) {
-    //     var a = 0;
-    //     el.offer.features.every(function (dataFeature) {
-    //       if (dataFeature === filterFeatures[0]) {
-    //         a++;
-    //         return false;
-    //       } else {
-    //         return true;
-    //       }
-    //     });
-    //     return a > 0;
-    //   });
-
-
-    //   var secondArray = window.data.fullData.filter(function (el) {
-    //     var a = 0;
-    //     el.offer.features.every(function (dataFeature) {
-    //       if (dataFeature === filterFeatures[1]) {
-    //         a++;
-    //         return false;
-    //       } else {
-    //         return true;
-    //       }
-    //     });
-    //     return a > 0;
-    //   });
-    //   var thirdArray = window.data.fullData.filter(function (el) {
-    //     var a = 0;
-    //     el.offer.features.every(function (dataFeature) {
-    //       if (dataFeature === filterFeatures[2]) {
-    //         a++;
-    //         return false;
-    //       } else {
-    //         return true;
-    //       }
-    //     });
-    //     return a > 0;
-    //   });
-    //   var fourthArray = window.data.fullData.filter(function (el) {
-    //     var a = 0;
-    //     el.offer.features.every(function (dataFeature) {
-    //       if (dataFeature === filterFeatures[3]) {
-    //         a++;
-    //         return false;
-    //       } else {
-    //         return true;
-    //       }
-    //     });
-    //     return a > 0;
-    //   });
-    //   var fifthArray = window.data.fullData.filter(function (el) {
-    //     var a = 0;
-    //     el.offer.features.every(function (dataFeature) {
-    //       if (dataFeature === filterFeatures[4]) {
-    //         a++;
-    //         return false;
-    //       } else {
-    //         return true;
-    //       }
-    //     });
-    //     return a > 0;
-    //   });
-    //   var sixsArray = window.data.fullData.filter(function (el) {
-    //     var a = 0;
-    //     el.offer.features.every(function (dataFeature) {
-    //       if (dataFeature === filterFeatures[5]) {
-    //         a++;
-    //         return false;
-    //       } else {
-    //         return true;
-    //       }
-    //     });
-    //     return a > 0;
-    //   });
-
-  //   var allFilters = [
-  //     firstArray,
-  //     secondArray,
-  //     thirdArray,
-  //     fourthArray,
-  //     fifthArray,
-  //     sixsArray
-  //   ];
-  //   var max = -Infinity;
-  //   var index = -1;
-  //   allFilters.forEach(function (a, i) {
-  //     if (a.length > max) {
-  //       max = a.length;
-  //       index = i;
-  //     }
-  //   });
-  //   var maxLengthArray = allFilters[index].map(function (obj) {
-  //     return obj;
-  //   });
-  //   allFilters[index] = [];
-  //   var rating = 0;
-  //   var filteredWithRating = [];
-  //   var ratingObj = {};
-  //   maxLengthArray.forEach(function (totalEl) {
-  //     allFilters.forEach(function (filterArr) {
-  //       filterArr.every(function (filterEl) {
-  //         if (totalEl === filterEl) {
-  //           rating++;
-  //           return false;
-  //         } else {
-  //           return true;
-  //         }
-  //       });
-  //     });
-  //     ratingObj.rating = rating;
-  //     ratingObj.array = totalEl;
-  //     filteredWithRating.unshift(ratingObj);
-  //     ratingObj = {};
-  //     rating = 0;
-  //   });
-  //   filteredWithRating.sort(function (a, b) {
-  //     if (a.rating < b.rating) {
-  //       return 1;
-  //     }
-  //     if (a.rating > b.rating) {
-  //       return -1;
-  //     }
-  //     return 0;
-  //   });
-  //   if (filterFeaturesArray.length !== 0) {
-  //     var maxRating = filteredWithRating[0].rating;
-  //     var sortedArray = filteredWithRating.filter(function (element) {
-  //       return element.rating === maxRating;
-  //     });
-  //     if (sortedArray.length > 5) {
-  //       var lastArray = sortedArray.splice(0, 5);
-  //     } else {
-  //       lastArray = sortedArray;
-  //     }
-  //     var readyArray = lastArray.map(function (el) {
-  //       return el.array;
+  // function checkForElement(filterName) {
+  //   if (filterName.checked && filterFeaturesArray[0] !== filterName.value) {
+  //     filterFeaturesArray.unshift(filterName.value);
+  //   } else {
+  //     filterFeaturesArray.forEach(function (el, index) {
+  //       if (el === filterName.value) {
+  //         filterFeaturesArray.splice(index, 1);
+  //       }
   //     });
   //   }
-  //   if (filterFeaturesArray.length !== 0) {
-  //     window.map.renderArray = readyArray;
+  //   window.map.filterFeaturesArray = filterFeaturesArray;
+  // }
+
+  // function checkFeatures(arr) {
+  //   var filterFeatures = window.map.filterFeaturesArray;
+  //   var maxRating = filterFeatures.length;
+  //   if (filterFeatures.length !== 0) {
+  //     var nnnFilters = [];
+  //     arr.every(function (el) {
+  //       var rrating = 0;
+  //       var rratedFilter = {};
+  //       el.offer.features.every(function (dataFeature) {
+  //         for (var z = 0; z < dataFeature.length; z++) {
+  //           for (var d = 0; d < filterFeatures.length; d++) {
+  //             if (dataFeature === filterFeatures[d]) {
+  //               rrating++;
+  //               return true;
+  //             } else if (rrating === filterFeatures.length) {
+  //               return false;
+  //             }
+  //           }
+  //         }
+  //         return true;
+  //       });
+  //       if (rrating === maxRating && nnnFilters.length < 5) {
+  //         rratedFilter.rating = rrating;
+  //         rratedFilter.array = el;
+  //         nnnFilters.unshift(rratedFilter);
+  //       }
+  //       return true;
+  //     });
+  //     var nnnReady = [];
+  //     for (var a = 0; a < nnnFilters.length; a++) {
+  //       nnnReady.unshift(nnnFilters[a].array);
+  //     }
+  //     window.map.renderArray = nnnReady;
   //   } else {
   //     window.map.renderArray = window.data.fullData;
   //   }
-  }
+  // }
 
-  filterWiFI.addEventListener('change', window.debounce(function () {
-    checkForElement(filterWiFI);
-    checkFeatures();
-    window.map.filterChange(window.map.renderArray);
-  }));
+  filterWiFI.addEventListener('change', window.debounce(featuresFilterChanged));
 
-  filterDishwasher.addEventListener('change', window.debounce(function () {
-    checkForElement(filterDishwasher);
-    checkFeatures();
-    window.map.filterChange(window.map.renderArray);
-  }));
-  filterParking.addEventListener('change', window.debounce(function () {
-    checkForElement(filterParking);
-    checkFeatures();
-    window.map.filterChange(window.map.renderArray);
-  }));
-  filterWasher.addEventListener('change', window.debounce(function () {
-    checkForElement(filterWasher);
-    checkFeatures();
-    window.map.filterChange(window.map.renderArray);
-  }));
-  filterElevator.addEventListener('change', window.debounce(function () {
-    checkForElement(filterElevator);
-    checkFeatures();
-    window.map.filterChange(window.map.renderArray);
-  }));
-  filterConditioner.addEventListener('change', window.debounce(function () {
-    checkForElement(filterConditioner);
-    checkFeatures();
-    window.map.filterChange(window.map.renderArray);
-  }));
+  filterDishwasher.addEventListener('change', window.debounce(featuresFilterChanged));
+
+  filterParking.addEventListener('change', window.debounce(featuresFilterChanged));
+
+  filterWasher.addEventListener('change', window.debounce(featuresFilterChanged));
+
+  filterElevator.addEventListener('change', window.debounce(featuresFilterChanged));
+
+  filterConditioner.addEventListener('change', window.debounce(featuresFilterChanged));
 
   window.map = {
     filterChange: function (filteringArray) {
@@ -544,15 +433,18 @@
         var mapPin2 = document.querySelector('#map_pin_n_' + z);
         mapPins2.push(mapPin2);
       }
+
+      var activatePin = function (evt) {
+        if (evt.button === MOUSE_LEFT_BUTTON) {
+          activateTemplate(evt, ActionType.CLICK, arr);
+        } else if (evt.key === KeyboardKey.ENTER) {
+          activateTemplate(evt, ActionType.KEY, arr);
+        }
+      };
+
       mapPins2.forEach(function (pin) {
-        pin.addEventListener('click', function (evt3) {
-          activateTemplate(evt3, ActionType.CLICK, arr);
-        });
-        pin.addEventListener('keyup', function (evt4) {
-          if (evt4.key === KeyboardKey.ENTER) {
-            activateTemplate(evt4, ActionType.KEY, arr);
-          }
-        });
+        pin.addEventListener('click', activatePin);
+        pin.addEventListener('keyup', activatePin);
       });
     },
 
@@ -572,7 +464,7 @@
           window.pin.createDOMElement(window.map.newArray);
         }
       }
-      mapOverlay.addEventListener('mousemove', function (adressMousemoveEvt) {
+      var addressChange = function (adressMousemoveEvt) {
         if (window.map.bigPinClicked === true) {
           if (adressMousemoveEvt.offsetY - window.data.PINYSIZE >= UP_Y_BORDER) {
             if (adressMousemoveEvt.offsetY <= BOTTOM_Y_BORDER) {
@@ -602,19 +494,19 @@
           window.map.addressY = addressY;
           window.main.address.value = addressX + ', ' + addressY;
         }
-      });
-      mapOverlay.addEventListener('mouseup', function () {
-        window.map.bigPinClicked = false;
-      });
+      };
 
-      bigPin.addEventListener('mouseup', function () {
-        window.map.bigPinClicked = false;
-      });
+      mapOverlay.addEventListener('mousemove', addressChange);
 
-      document.addEventListener('mouseup', function () {
-
+      var onMouseUpAction = function () {
         window.map.bigPinClicked = false;
-      });
+      };
+
+      mapOverlay.addEventListener('mouseup', onMouseUpAction);
+
+      bigPin.addEventListener('mouseup', onMouseUpAction);
+
+      document.addEventListener('mouseup', onMouseUpAction);
 
     },
     activated: false,
