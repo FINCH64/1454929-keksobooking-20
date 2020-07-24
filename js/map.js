@@ -48,6 +48,8 @@
   var counter = 0;
   var lowestPriceHolder = LOWEST_PRICE;
   var highestPriceHolder = HIGHEST_PRICE;
+  var addressY = 0;
+  var addressX = 0;
 
   window.activate = function (manage) {
     if (manage === 'activate1') {
@@ -98,19 +100,33 @@
       }
     }
   };
+  var isClicked = function () {
+    window.map.bigPinClicked = true;
+  };
+
   var getServerData = function (evt) {
     if (evt.button === MOUSE_LEFT_BUTTON || evt.key === KeyboardKey.ENTER) {
-      window.map.bigPinClicked = true;
       if (window.data !== null && window.data !== undefined) {
         window.map.manageServerData(evt);
       } else {
         window.newData.loadFunction(evt);
       }
+
+      bigPin.addEventListener('mousedown', isClicked);
+
+      mapOverlay.addEventListener('mousemove', window.map.addressChange);
+
+      mapOverlay.addEventListener('mouseup', window.map.onMouseUpAction);
+
+      bigPin.addEventListener('mouseup', window.map.onMouseUpAction);
+
+      document.addEventListener('mouseup', window.map.onMouseUpAction);
     }
   };
 
   bigPin.addEventListener('mousedown', getServerData);
 
+  bigPin.addEventListener('mousedown', isClicked);
 
   bigPin.addEventListener('keydown', getServerData);
 
@@ -155,6 +171,8 @@
           article2.remove();
           activePin.classList.remove('map__pin--active');
         }
+        popupClose.removeEventListener('click', cardRemove);
+        document.removeEventListener('keydown', cardRemove);
       };
 
       popupClose.addEventListener('click', cardRemove);
@@ -397,9 +415,40 @@
       });
     },
 
+    addressChange: function (adressMousemoveEvt) {
+      if (window.map.bigPinClicked === true) {
+        if (adressMousemoveEvt.offsetY - window.data.PINYSIZE >= UP_Y_BORDER) {
+          if (adressMousemoveEvt.offsetY <= BOTTOM_Y_BORDER) {
+            addressY = adressMousemoveEvt.offsetY + window.data.PINYSIZE;
+            bigPin.style.top = adressMousemoveEvt.offsetY - window.data.PINYSIZE + 'px';
+          } else {
+            addressY = BOTTOM_Y_BORDER;
+            bigPin.style.top = (BOTTOM_Y_BORDER - window.data.PINYSIZE) + 'px';
+          }
+        } else {
+          addressY = UP_Y_BORDER;
+          bigPin.style.top = (UP_Y_BORDER - window.data.PINYSIZE) + 'px';
+        }
+        if (adressMousemoveEvt.offsetX >= LEFT_X_BODER + X_GAP) {
+          if (adressMousemoveEvt.offsetX <= RIGHT_X_BORDER - X_GAP) {
+            addressX = adressMousemoveEvt.offsetX + window.data.PINXSIZE;
+            bigPin.style.left = adressMousemoveEvt.offsetX - window.data.PINXSIZE / 2 + 'px';
+          } else {
+            addressX = RIGHT_X_BORDER;
+            bigPin.style.left = (RIGHT_X_BORDER - window.data.PINXSIZE / 2) + 'px';
+          }
+        } else {
+          addressX = LEFT_X_BODER;
+          bigPin.style.left = -window.data.PINXSIZE / 2 + 'px';
+        }
+        window.map.addressX = addressX;
+        window.map.addressY = addressY;
+        window.main.address.value = addressX + ', ' + addressY;
+      }
+    },
+
+
     manageServerData: function (evt) {
-      var addressY = 0;
-      var addressX = 0;
       window.map.newArray = window.data.newLists;
       window.map.addressX = PIN_X_START;
       window.map.addressY = PIN_Y_START;
@@ -413,50 +462,10 @@
           window.pin.createDOMElement(window.map.newArray);
         }
       }
-      var addressChange = function (adressMousemoveEvt) {
-        if (window.map.bigPinClicked === true) {
-          if (adressMousemoveEvt.offsetY - window.data.PINYSIZE >= UP_Y_BORDER) {
-            if (adressMousemoveEvt.offsetY <= BOTTOM_Y_BORDER) {
-              addressY = adressMousemoveEvt.offsetY + window.data.PINYSIZE;
-              bigPin.style.top = adressMousemoveEvt.offsetY - window.data.PINYSIZE + 'px';
-            } else {
-              addressY = BOTTOM_Y_BORDER;
-              bigPin.style.top = (BOTTOM_Y_BORDER - window.data.PINYSIZE) + 'px';
-            }
-          } else {
-            addressY = UP_Y_BORDER;
-            bigPin.style.top = (UP_Y_BORDER - window.data.PINYSIZE) + 'px';
-          }
-          if (adressMousemoveEvt.offsetX >= LEFT_X_BODER + X_GAP) {
-            if (adressMousemoveEvt.offsetX <= RIGHT_X_BORDER - X_GAP) {
-              addressX = adressMousemoveEvt.offsetX + window.data.PINXSIZE;
-              bigPin.style.left = adressMousemoveEvt.offsetX - window.data.PINXSIZE / 2 + 'px';
-            } else {
-              addressX = RIGHT_X_BORDER;
-              bigPin.style.left = (RIGHT_X_BORDER - window.data.PINXSIZE / 2) + 'px';
-            }
-          } else {
-            addressX = LEFT_X_BODER;
-            bigPin.style.left = -window.data.PINXSIZE / 2 + 'px';
-          }
-          window.map.addressX = addressX;
-          window.map.addressY = addressY;
-          window.main.address.value = addressX + ', ' + addressY;
-        }
-      };
 
-      mapOverlay.addEventListener('mousemove', addressChange);
-
-      var onMouseUpAction = function () {
-        window.map.bigPinClicked = false;
-      };
-
-      mapOverlay.addEventListener('mouseup', onMouseUpAction);
-
-      bigPin.addEventListener('mouseup', onMouseUpAction);
-
-      document.addEventListener('mouseup', onMouseUpAction);
-
+    },
+    onMouseUpAction: function () {
+      window.map.bigPinClicked = false;
     },
     activated: false,
     pinXStart: PIN_X_START,

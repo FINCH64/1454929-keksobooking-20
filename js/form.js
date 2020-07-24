@@ -61,6 +61,8 @@
           window.main.map.removeChild(errorMessage);
         }
       }
+      document.removeEventListener('click', deleteEroorMessage);
+      document.removeEventListener('keydown', deleteEroorMessage);
     };
 
     document.addEventListener('click', deleteEroorMessage);
@@ -83,6 +85,8 @@
           var removingMessage = document.querySelector('.success');
           window.main.map.removeChild(removingMessage);
           reset.click();
+          document.removeEventListener('mousedown', sucessMessageDeleter);
+          document.removeEventListener('keydown', sucessMessageDeleter);
         }
       }
     };

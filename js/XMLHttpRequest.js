@@ -12,18 +12,21 @@
       } else {
         onError('Cтатус ответа: ' + xhr.status + ' ' + xhr.statusText);
       }
+      xhr.removeEventListener('load', onLoadAction);
     };
 
     xhr.addEventListener('load', onLoadAction);
 
     var onErrorAction = function () {
       onError('Произошла ошибка соединения');
+      xhr.removeEventListener('error', onErrorAction);
     };
 
     xhr.addEventListener('error', onErrorAction);
 
     var onTimeoutAction = function () {
       onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
+      xhr.removeEventListener('timeout', onTimeoutAction);
     };
 
     xhr.addEventListener('timeout', onTimeoutAction);
@@ -46,18 +49,21 @@
       } else {
         onError('Cтатус ответа: ' + xhr.status + ' ' + xhr.statusText);
       }
+      xhr.removeEventListener('load', onLoadAction);
     };
 
     xhr.addEventListener('load', onLoadAction);
 
     var onErrorAction = function () {
       onError('Произошла ошибка соединения');
+      xhr.removeEventListener('error', onErrorAction);
     };
 
     xhr.addEventListener('error', onErrorAction);
 
     var onTimeoutAction = function () {
       onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
+      xhr.removeEventListener('timeout', onTimeoutAction);
     };
 
     xhr.addEventListener('timeout', onTimeoutAction);

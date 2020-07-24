@@ -10,7 +10,14 @@
       };
 
       var onSuccess = function (data) {
+        var mapOverlay = document.querySelector('.map__overlay');
+        var bigPin = document.querySelector('.map__pin--main');
+        mapOverlay.removeEventListener('mouseup', window.map.onMouseUpAction);
 
+        bigPin.removeEventListener('mouseup', window.map.onMouseUpAction);
+
+        document.removeEventListener('mouseup', window.map.onMouseUpAction);
+        mapOverlay.removeEventListener('mousemove', window.map.addressChange);
         var fullData = data.map(function (object) {
           return object;
         });
