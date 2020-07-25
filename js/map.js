@@ -208,7 +208,7 @@
     window.map.filterChange(window.map.renderArray);
   };
 
-  housingType.addEventListener('change', window.debounce(typeFilterChangedAction));
+  housingType.addEventListener('change', typeFilterChangedAction);
 
   var priceFilterChangedAction = function () {
     switch (housingPrice.value) {
@@ -232,7 +232,7 @@
     window.map.filterChange(window.map.renderArray);
   };
 
-  housingPrice.addEventListener('change', window.debounce(priceFilterChangedAction));
+  housingPrice.addEventListener('change', priceFilterChangedAction);
 
   var roomsFilterChangedAction = function () {
     switch (housingRooms.value) {
@@ -252,7 +252,7 @@
     window.map.filterChange(window.map.renderArray);
   };
 
-  housingRooms.addEventListener('change', window.debounce(roomsFilterChangedAction));
+  housingRooms.addEventListener('change', roomsFilterChangedAction);
 
   var guestsFilterChangedAction = function () {
     switch (housingGuests.value) {
@@ -272,25 +272,15 @@
     window.map.filterChange(window.map.renderArray);
   };
 
-  housingGuests.addEventListener('change', window.debounce(guestsFilterChangedAction));
+  housingGuests.addEventListener('change', guestsFilterChangedAction);
 
-  var featuresFilterChanged = function (evt) {
-    if (evt.target.checked && filterFeaturesArray[0] !== evt.target.value) {
-      filterFeaturesArray.unshift(evt.target.value);
-    } else {
-      filterFeaturesArray.forEach(function (element, index) {
-        if (element === evt.target.value) {
-          filterFeaturesArray.splice(index, 1);
-        }
-      });
-    }
-    window.map.filterFeaturesArray = filterFeaturesArray;
-
+  var filterByFeaturesActivate = function () {
     var filterFeatures = window.map.filterFeaturesArray;
     var maxRating = filterFeatures.length;
     if (filterFeatures.length !== 0) {
       var filteredWithRatingLists = [];
-      window.data.fullData.every(function (element) {
+
+      var arrayFillIn = function (element) {
         var rating = 0;
         var filteredWithRatingElement = {};
         element.offer.features.every(function (dataFeature) {
@@ -306,13 +296,20 @@
           }
           return true;
         });
-        if (rating === maxRating && filteredWithRatingLists.length < 5) {
+        if (rating === maxRating) {
           filteredWithRatingElement.rating = rating;
           filteredWithRatingElement.array = element;
           filteredWithRatingLists.unshift(filteredWithRatingElement);
         }
         return true;
+      };
+
+      window.data.fullData.forEach(function (element) {
+        if (filteredWithRatingLists.length < 5) {
+          arrayFillIn(element);
+        }
       });
+
       var filteredWithoutRatingLists = [];
       for (var a = 0; a < filteredWithRatingLists.length; a++) {
         filteredWithoutRatingLists.unshift(filteredWithRatingLists[a].array);
@@ -322,22 +319,38 @@
       window.map.renderArray = window.data.fullData;
     }
     window.map.filterChange(window.map.renderArray);
+
   };
 
-  filterWiFI.addEventListener('change', window.debounce(featuresFilterChanged));
+  var featuresFilterChanged = function (evt) {
+    if (evt.target.checked && filterFeaturesArray[0] !== evt.target.value) {
+      filterFeaturesArray.unshift(evt.target.value);
+    } else {
+      filterFeaturesArray.forEach(function (element, index) {
+        if (element === evt.target.value) {
+          filterFeaturesArray.splice(index, 1);
+        }
+      });
+    }
+    window.map.filterFeaturesArray = filterFeaturesArray;
 
-  filterDishwasher.addEventListener('change', window.debounce(featuresFilterChanged));
+    filterByFeaturesActivate();
+  };
 
-  filterParking.addEventListener('change', window.debounce(featuresFilterChanged));
+  filterWiFI.addEventListener('change', featuresFilterChanged);
 
-  filterWasher.addEventListener('change', window.debounce(featuresFilterChanged));
+  filterDishwasher.addEventListener('change', featuresFilterChanged);
 
-  filterElevator.addEventListener('change', window.debounce(featuresFilterChanged));
+  filterParking.addEventListener('change', featuresFilterChanged);
 
-  filterConditioner.addEventListener('change', window.debounce(featuresFilterChanged));
+  filterWasher.addEventListener('change', featuresFilterChanged);
+
+  filterElevator.addEventListener('change', featuresFilterChanged);
+
+  filterConditioner.addEventListener('change', featuresFilterChanged);
 
   window.map = {
-    filterChange: function (filteringArray) {
+    filterChange: window.debounce(function (filteringArray) {
       switch (counter) {
         case 0:
           var mapPins = document.querySelector('.map__pins');
@@ -392,7 +405,7 @@
       window.map.newArray = newArray;
       window.pin.createDOMElement(newArray);
       counter++;
-    },
+    }),
 
     activateCards: function (array) {
       var mapPinsActivated = [];
